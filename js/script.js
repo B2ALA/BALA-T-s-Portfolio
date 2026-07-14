@@ -1,258 +1,238 @@
 /* js/script.js
-   Phase 1 runtime:
-   - Particle engine (canvas)
-   - Parallax driver (pointer)
-   - Live dashboard plumbing (progress, status rotator, live info)
-   - Demo SVG part animation hooks (crane arm, trolley, hook)
-   - Micro-interactions (panel tilt, hover glow)
-   - Prefers-reduced-motion support
+   Media loader + sync logic for Phase 1→5 integration
+   - Injects video/gif/lottie into .media-container
+   - Adds badge overlay and floating animation (CSS)
+   - Syncs media playback to progress sequence when requested
+   - No external network calls; assets must be placed locally
 */
 
-/* =========================
-   Utilities
-   ========================= */
+/* Utilities */
 const rand = (min, max) => Math.random() * (max - min) + min;
 const rint = (min, max) => Math.floor(rand(min, max + 1));
-const choose = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* =========================
-   DOM references
-   ========================= */
-const constructionScene = document.getElementById('constructionScene');
-const electricalScene = document.getElementById('electricalScene');
-const infraScene = document.getElementById('infraScene');
-
-const constructionProps = document.getElementById('constructionProps');
-const electricalProps = document.getElementById('electricalProps');
-const infraProps = document.getElementById('infraProps');
-
-const progressFill = document.getElementById('progressFill');
-const progressPercent = document.getElementById('progressPercent');
-const statusRotator = document.getElementById('statusRotator');
-
-const liveDate = document.getElementById('liveDate');
-const liveTime = document.getElementById('liveTime');
-const liveDay = document.getElementById('liveDay');
-const liveEst = document.getElementById('liveEst');
-const liveUpdate = document.getElementById('liveUpdate');
-const liveServer = document.getElementById('liveServer');
-const liveNet = document.getElementById('liveNet');
-const livePhase = document.getElementById('livePhase');
-
-/* =========================
-   Progress & Status
-   ========================= */
+/* Progress sequence used across the UI */
 const progressSequence = [61,63,65,67,69,71,73,75];
 let progressIndex = 0;
-function setProgress(v){
-  progressFill.style.width = `${v}%`;
-  progressPercent.textContent = `${v}%`;
-  // subtle pulse
-  try {
-    progressFill.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(1.02)' }, { transform: 'scaleY(1)' }], { duration: 900, easing: 'cubic-bezier(.2,.9,.3,1)' });
-  } catch(e){}
-}
-function startProgressLoop(){
-  setProgress(progressSequence[progressIndex]);
-  progressIndex = (progressIndex + 1) % progressSequence.length;
-  setInterval(()=> {
-    setProgress(progressSequence[progressIndex]);
-    progressIndex = (progressIndex + 1) % progressSequence.length;
-  }, 1800);
+
+/* DOM refs for progress sync */
+const progressFill = document.getElementById('progressFill');
+const progressPercent = document.getElementById('progressPercent');
+
+/* Helper: set global progress UI */
+function setGlobalProgress(value) {
+  if (!progressFill || !progressPercent) return;
+  progressFill.style.width = `${value}%`;
+  progressPercent.textContent = `${value}%`;
 }
 
-/* Status rotator */
-const statuses = [
-  "Installing New Features...",
-  "Optimizing Performance...",
-  "Improving Security...",
-  "Testing Stability...",
-  "Deploying Updates...",
-  "Building Better Experience...",
-  "Enhancing Performance...",
-  "Synchronizing Database...",
-  "Connecting Cloud Servers...",
-  "Calibrating AI Modules...",
-  "Launching Soon...",
-  "Almost Ready..."
-];
-let statusIndex = 0;
-function rotateStatus(){
-  if(prefersReduced) { statusRotator.textContent = statuses[statusIndex % statuses.length]; statusIndex++; return; }
-  statusRotator.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = () => {
-    statusRotator.textContent = statuses[statusIndex % statuses.length];
-    statusRotator.animate([{ opacity:0 }, { opacity:1 }], { duration:300, fill:'forwards' });
-    statusIndex++;
-  };
+/* Map a 0..1 ratio to the progressSequence (returns integer percent) */
+function mapRatioToProgress(ratio) {
+  // Map ratio to index in progressSequence, then interpolate to next value
+  const len = progressSequence.length;
+  if (len === 0) return 0;
+  const pos = ratio * (len - 1);
+  const i = Math.floor(pos);
+  const t = pos - i;
+  const a = progressSequence[i];
+  const b = progressSequence[Math.min(i + 1, len - 1)];
+  return Math.round(a + (b - a) * t);
 }
-setInterval(rotateStatus, 4000);
-rotateStatus();
 
-/* Live info updater */
-function updateLiveInfo(){
-  const now = new Date();
-  liveDate.textContent = now.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
-  liveTime.textContent = now.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-  liveDay.textContent = now.toLocaleDateString(undefined, { weekday:'long' });
-  const minutesLeft = 30 + (progressIndex % 6) * 7;
-  const est = new Date(now.getTime() + minutesLeft * 60000);
-  liveEst.textContent = est.toLocaleString(undefined, { hour:'2-digit', minute:'2-digit', day:'numeric', month:'short' });
-  liveUpdate.textContent = now.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-
-  const serverStates = ['Degraded → Upgrading', 'Restarting Services', 'Applying Patches', 'Healthy'];
-  const netStates = ['Active', 'Syncing', 'Packet Loss (minor)', 'Stable'];
-  const phases = ['Preparing', 'Building', 'Testing', 'Deploying', 'Verifying'];
-
-  liveServer.textContent = serverStates[now.getSeconds() % serverStates.length];
-  liveNet.textContent = netStates[Math.floor(now.getSeconds() / 2) % netStates.length];
-  livePhase.textContent = phases[Math.floor(now.getMinutes() / 10) % phases.length];
+/* Create badge element */
+function createBadge(text) {
+  const badge = document.createElement('div');
+  badge.className = 'media-badge';
+  badge.textContent = text || 'LIVE';
+  // choose style by text heuristics
+  const t = (text || '').toLowerCase();
+  if (t.includes('active')) badge.classList.add('media-badge--active');
+  else if (t.includes('work') || t.includes('working')) badge.classList.add('media-badge--working');
+  else if (t.includes('upgrad')) badge.classList.add('media-badge--upgrading');
+  return badge;
 }
-updateLiveInfo();
-setInterval(updateLiveInfo, 1000);
 
-/* =========================
-   Background Particles (Canvas)
-   - lightweight, optimized for performance
-   ========================= */
-(function bgParticles(){
-  const canvas = document.getElementById('bgParticles');
-  if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let w = canvas.width = innerWidth;
-  let h = canvas.height = innerHeight;
-  const particles = [];
-  const count = Math.max(24, Math.round((w*h)/90000)); // capped density
+/* Inject media element into container */
+function injectMedia(container) {
+  const type = (container.dataset.assetType || '').toLowerCase();
+  const src = container.dataset.assetSrc || '';
+  const badgeText = container.dataset.badge || '';
+  const shouldSync = container.dataset.sync === 'progress';
 
-  function create(){
-    for(let i=0;i<count;i++){
-      particles.push({
-        x: Math.random()*w,
-        y: Math.random()*h,
-        r: rand(0.3,1.8),
-        vx: rand(-0.12,0.12),
-        vy: rand(-0.03,0.03),
-        alpha: rand(0.02,0.18)
+  // clear container
+  container.innerHTML = '';
+
+  // add badge
+  const badge = createBadge(badgeText);
+  container.appendChild(badge);
+
+  // create wrapper for the actual media element
+  const mediaWrapper = document.createElement('div');
+  mediaWrapper.className = 'media-inner';
+  mediaWrapper.style.width = '100%';
+  mediaWrapper.style.height = '100%';
+  mediaWrapper.style.position = 'relative';
+  mediaWrapper.style.zIndex = '2';
+  container.appendChild(mediaWrapper);
+
+  // helper to attach sync listeners
+  function attachSync(mediaEl) {
+    if (!shouldSync) return;
+    // if media has duration, map currentTime/duration to progress
+    if (mediaEl.tagName === 'VIDEO' || mediaEl.tagName === 'AUDIO') {
+      mediaEl.addEventListener('timeupdate', () => {
+        if (!mediaEl.duration || isNaN(mediaEl.duration) || mediaEl.duration === Infinity) return;
+        const ratio = Math.min(1, Math.max(0, mediaEl.currentTime / mediaEl.duration));
+        const p = mapRatioToProgress(ratio);
+        setGlobalProgress(p);
       });
+      // when video loops, optionally advance progressIndex to keep global loop moving
+      mediaEl.addEventListener('ended', () => {
+        // no-op: video loops automatically; progress will update on timeupdate
+      });
+    } else if (mediaEl.tagName === 'CANVAS' && window.lottie) {
+      // Lottie: use frame events if available
+      try {
+        const anim = mediaEl.__lottieInstance;
+        if (anim && anim.totalFrames) {
+          anim.addEventListener('enterFrame', (e) => {
+            const ratio = (e.currentTime || 0) / anim.totalFrames;
+            const p = mapRatioToProgress(ratio);
+            setGlobalProgress(p);
+          });
+        }
+      } catch (e) {
+        // ignore
+      }
     }
   }
-  function resize(){
-    w = canvas.width = innerWidth;
-    h = canvas.height = innerHeight;
-    particles.length = 0;
-    create();
-  }
-  function draw(){
-    ctx.clearRect(0,0,w,h);
-    for(const p of particles){
-      p.x += p.vx;
-      p.y += p.vy;
-      if(p.x < -10) p.x = w + 10;
-      if(p.x > w + 10) p.x = -10;
-      if(p.y < -10) p.y = h + 10;
-      if(p.y > h + 10) p.y = -10;
-      ctx.beginPath();
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fill();
-    }
-    requestAnimationFrame(draw);
-  }
-  create();
-  draw();
-  addEventListener('resize', resize);
-})();
 
-/* =========================
-   Parallax (pointer-based)
-   - subtle depth movement for background layers
-   ========================= */
-(function parallax(){
-  if(prefersReduced) return;
-  const lights = document.querySelectorAll('.volumetric .beam');
-  const objects = document.querySelectorAll('.bg-objects .gear, .bg-objects .star');
-  let mouseX = 0, mouseY = 0, rx = 0, ry = 0;
-  window.addEventListener('pointermove', (e) => {
-    const cx = innerWidth/2, cy = innerHeight/2;
-    mouseX = (e.clientX - cx) / cx;
-    mouseY = (e.clientY - cy) / cy;
-  }, { passive:true });
-  function raf(){
-    rx += (mouseX - rx) * 0.06;
-    ry += (mouseY - ry) * 0.06;
-    lights.forEach((el,i) => {
-      const depth = (i+1)*6;
-      el.style.transform = `translate3d(${rx*depth}px, ${ry*depth}px, 0)`;
+  // create media based on type
+  if (type === 'video' || /\.webm|\.mp4|\.mov$/i.test(src)) {
+    // create <video> element
+    const video = document.createElement('video');
+    video.className = 'media-element';
+    video.src = src;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.preload = 'auto';
+    video.setAttribute('aria-hidden', 'true');
+    // autoplay policy: attempt to play
+    video.addEventListener('canplay', () => {
+      if (!prefersReduced) {
+        const p = video.play();
+        if (p && p.catch) p.catch(() => { /* autoplay blocked; user interaction required */ });
+      }
     });
-    objects.forEach((el,i) => {
-      const depth = (i%2===0?1.6:2.6);
-      el.style.transform = `translate3d(${rx*(i+1)*depth}px, ${ry*(i+1)*depth}px, 0) rotate(${rx*(i+1)*6}deg)`;
-    });
-    requestAnimationFrame(raf);
+    mediaWrapper.appendChild(video);
+    attachSync(video);
+    return video;
   }
-  raf();
-})();
 
-/* =========================
-   Demo: Animate crane parts (Phase 1 sample)
-   - Uses CSS keyframes for long loops and inline style variables for variety
-   ========================= */
-(function animateCrane(){
-  const svg = document.getElementById('craneSVG');
-  if(!svg) return;
-  const armGroup = svg.querySelector('#armGroup > g');
-  const trolley = svg.querySelector('#trolley');
-  const hookGroup = svg.querySelector('#hookGroup');
-
-  if(!prefersReduced){
-    // randomized durations for asynchronous motion
-    armGroup.style.animation = `craneRotate ${rand(10,18).toFixed(2)}s cubic-bezier(.2,.9,.3,1) ${rand(0,2).toFixed(2)}s infinite`;
-    trolley.style.animation = `trolleyMove ${rand(6,12).toFixed(2)}s linear ${rand(0,2).toFixed(2)}s infinite`;
-    hookGroup.style.animation = `hookLift ${rand(2.6,5.2).toFixed(2)}s ease-in-out ${rand(0,1.6).toFixed(2)}s infinite`;
-  } else {
-    // reduced motion: set static transforms
-    armGroup.style.transform = 'rotate(-6deg)';
+  if (type === 'gif' || /\.gif$/i.test(src)) {
+    // GIF fallback: use <img>
+    const img = document.createElement('img');
+    img.className = 'media-element';
+    img.src = src;
+    img.alt = container.getAttribute('aria-label') || 'Animation';
+    img.setAttribute('aria-hidden', 'true');
+    mediaWrapper.appendChild(img);
+    // GIFs cannot be time-synced reliably; skip sync
+    return img;
   }
-})();
 
-/* =========================
-   Micro-interactions & accessibility
-   - Panel tilt on pointer move
-   - Brand hover glow
-   ========================= */
-(function microInteractions(){
-  if(!prefersReduced){
-    const panels = document.querySelectorAll('.panel');
-    panels.forEach(panel => {
-      let rect = null;
-      panel.addEventListener('pointerenter', () => rect = panel.getBoundingClientRect());
-      panel.addEventListener('pointermove', (e) => {
-        if(!rect) rect = panel.getBoundingClientRect();
-        const px = (e.clientX - rect.left) / rect.width;
-        const py = (e.clientY - rect.top) / rect.height;
-        const rx = (py - 0.5) * 6; // rotateX
-        const ry = (px - 0.5) * -8; // rotateY
-        panel.style.transform = `perspective(900px) translateY(-6px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  if (type === 'lottie' || /\.json$/i.test(src)) {
+    // Lottie: requires lottie.min.js to be loaded locally (window.lottie)
+    if (window.lottie) {
+      // create a canvas/div for lottie
+      const lottieHolder = document.createElement('div');
+      lottieHolder.style.width = '100%';
+      lottieHolder.style.height = '100%';
+      lottieHolder.style.pointerEvents = 'none';
+      mediaWrapper.appendChild(lottieHolder);
+
+      // load animation
+      const anim = window.lottie.loadAnimation({
+        container: lottieHolder,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: src
       });
-      panel.addEventListener('pointerleave', () => { panel.style.transform = ''; rect = null; });
-    });
+
+      // attach instance for sync
+      lottieHolder.__lottieInstance = anim;
+      attachSync(lottieHolder);
+
+      return lottieHolder;
+    } else {
+      // fallback: show a poster placeholder and a small note in console
+      const fallback = document.createElement('div');
+      fallback.className = 'media-element';
+      fallback.style.display = 'flex';
+      fallback.style.alignItems = 'center';
+      fallback.style.justifyContent = 'center';
+      fallback.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))';
+      fallback.style.color = 'rgba(255,255,255,0.7)';
+      fallback.style.fontWeight = '700';
+      fallback.textContent = 'Lottie asset (lottie.min.js not loaded)';
+      mediaWrapper.appendChild(fallback);
+      console.warn('Lottie requested but window.lottie is not available. Include lottie.min.js locally to enable Lottie playback.');
+      return fallback;
+    }
   }
 
-  const brand = document.querySelector('.brand');
-  if(brand){
-    brand.addEventListener('mouseenter', ()=> brand.style.filter = 'drop-shadow(0 12px 40px rgba(59,130,246,0.18))');
-    brand.addEventListener('mouseleave', ()=> brand.style.filter = '');
-  }
-})();
+  // Default fallback: show a neutral poster box
+  const poster = document.createElement('div');
+  poster.className = 'media-element';
+  poster.style.display = 'flex';
+  poster.style.alignItems = 'center';
+  poster.style.justifyContent = 'center';
+  poster.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))';
+  poster.style.color = 'rgba(255,255,255,0.7)';
+  poster.style.fontWeight = '700';
+  poster.textContent = 'Media asset not found';
+  mediaWrapper.appendChild(poster);
+  console.warn('Media container: unknown asset type or missing src:', type, src);
+  return poster;
+}
 
-/* =========================
-   Start progress loop (respect reduced motion)
-   ========================= */
-if(!prefersReduced) startProgressLoop();
-else setProgress(progressSequence[0]);
+/* Initialize all media containers on the page */
+function initMediaContainers() {
+  const containers = document.querySelectorAll('.media-container');
+  containers.forEach(container => {
+    // ensure container has role and accessible label
+    if (!container.getAttribute('role')) container.setAttribute('role', 'img');
+    if (!container.getAttribute('aria-label')) container.setAttribute('aria-label', 'Live animation');
 
-/* =========================
-   Phase 1 complete:
-   - Foundation ready for Phase 2–5
-   - Replace placeholders with full SVG scenes in next phases
-   ========================= */
+    // inject media element
+    injectMedia(container);
+
+    // add subtle entrance animation
+    container.style.opacity = 0;
+    container.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: 'cubic-bezier(.2,.9,.3,1)', fill: 'forwards' });
+  });
+}
+
+/* Run initialization on DOMContentLoaded */
+document.addEventListener('DOMContentLoaded', () => {
+  initMediaContainers();
+
+  // If you want the global progress to still cycle when no media is playing,
+  // keep the existing progress loop (61..75). Otherwise, media timeupdate will drive it.
+  // Here we keep both: if media sync is active it will override; otherwise loop runs.
+  (function startProgressLoop() {
+    let idx = 0;
+    setInterval(() => {
+      // only update if no media is currently driving progress (simple heuristic)
+      const anySyncing = Array.from(document.querySelectorAll('.media-container')).some(c => c.dataset.sync === 'progress' && c.querySelector('video'));
+      if (!anySyncing) {
+        const v = progressSequence[idx % progressSequence.length];
+        setGlobalProgress(v);
+        idx++;
+      }
+    }, 1800);
+  })();
+});
