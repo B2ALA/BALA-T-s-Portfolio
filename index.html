@@ -6,11 +6,9 @@
   <meta name="description" content="Cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
   <title>Website Under Maintenance — Upgrading Now</title>
 
-  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
 
-  <!-- Accessibility / SEO -->
   <meta name="robots" content="noindex,follow" />
 </head>
 <body>
@@ -21,14 +19,12 @@
       <div class="bg-gradient"></div>
       <div class="blueprint-grid"></div>
 
-      <!-- volumetric lights -->
       <div class="volumetric">
         <div class="beam beam--1"></div>
         <div class="beam beam--2"></div>
         <div class="beam beam--3"></div>
       </div>
 
-      <!-- decorative gears & stars -->
       <div class="bg-objects">
         <div class="gear g--1"></div>
         <div class="gear g--2"></div>
@@ -36,9 +32,7 @@
         <div class="star s--2"></div>
       </div>
 
-      <!-- canvas particles (JS) -->
       <canvas id="bgParticles" class="bg-particles"></canvas>
-
       <div class="fog-layer"></div>
       <div class="lensflare"></div>
     </div>
@@ -47,7 +41,7 @@
     <header class="header" role="banner" aria-label="Maintenance header">
       <div class="header-inner">
         <button class="brand" aria-label="Your Company Home" title="Your Company" tabindex="0">
-          <!-- Inline SVG logo (premium gradient + glow) -->
+          <!-- Inline SVG logo -->
           <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
             <defs>
               <linearGradient id="logoGrad" x1="0" x2="1">
@@ -80,62 +74,71 @@
         <article id="constructionPanel" class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0">
           <h2 id="construction-title" class="panel-title">Construction Department</h2>
 
-          <!-- Inline SVG crane + layered scene (detailed, animated via CSS/JS) -->
           <div class="scene scene--construction" id="constructionScene" role="img" aria-label="Construction site">
-            <!-- Detailed SVG crane (layered groups for animation) -->
+            <!-- Detailed crane SVG -->
             <svg id="craneSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="crane-svg" aria-hidden="true">
               <defs>
-                <linearGradient id="steel" x1="0" x2="1">
-                  <stop offset="0" stop-color="#2b3946"/>
-                  <stop offset="1" stop-color="#0b1220"/>
-                </linearGradient>
-                <linearGradient id="yellow" x1="0" x2="1">
-                  <stop offset="0" stop-color="#F59E0B"/>
-                  <stop offset="1" stop-color="#b45309"/>
-                </linearGradient>
-                <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000" flood-opacity="0.45"/>
-                </filter>
+                <linearGradient id="gSteel" x1="0" x2="1"><stop offset="0" stop-color="#2b3946"/><stop offset="1" stop-color="#0b1220"/></linearGradient>
+                <linearGradient id="gYellow" x1="0" x2="1"><stop offset="0" stop-color="#F59E0B"/><stop offset="1" stop-color="#b45309"/></linearGradient>
+                <radialGradient id="gMetalShine" cx="30%" cy="20%"><stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+                <filter id="dropShadow"><feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000" flood-opacity="0.45"/></filter>
               </defs>
 
               <!-- tower -->
               <g id="tower" transform="translate(120,60)">
-                <rect x="0" y="0" width="28" height="360" rx="6" fill="url(#steel)"></rect>
-                <!-- cross braces -->
+                <rect x="0" y="0" width="28" height="360" rx="6" fill="url(#gSteel)"></rect>
                 <g id="braces" fill="none" stroke="#0f1724" stroke-width="4" opacity="0.12">
                   <path d="M0,0 L28,40 M0,40 L28,80 M0,80 L28,120 M0,120 L28,160 M0,160 L28,200 M0,200 L28,240 M0,240 L28,280 M0,280 L28,320"></path>
+                </g>
+                <!-- bolts -->
+                <g id="towerBolts" fill="#071226" opacity="0.9">
+                  <circle cx="6" cy="20" r="2"/><circle cx="22" cy="20" r="2"/>
+                  <circle cx="6" cy="60" r="2"/><circle cx="22" cy="60" r="2"/>
+                  <circle cx="6" cy="100" r="2"/><circle cx="22" cy="100" r="2"/>
                 </g>
               </g>
 
               <!-- arm group (rotates) -->
               <g id="armGroup" transform="translate(148,80)">
                 <g id="arm" transform="rotate(-6)">
-                  <rect x="0" y="0" width="520" height="18" rx="8" fill="url(#steel)"></rect>
+                  <rect x="0" y="0" width="520" height="18" rx="8" fill="url(#gSteel)"></rect>
                   <rect x="12" y="4" width="496" height="6" rx="3" fill="rgba(255,255,255,0.02)"></rect>
+
+                  <!-- trolley -->
+                  <g id="trolley" transform="translate(260,-6)">
+                    <rect x="-18" y="-6" width="36" height="28" rx="4" fill="#0b1220" stroke="#CBD5E1" stroke-width="1.2"></rect>
+                    <rect x="-12" y="6" width="24" height="6" rx="2" fill="#b45309"></rect>
+                    <g id="trolleyWheels" fill="#071226">
+                      <circle cx="-8" cy="10" r="3"/><circle cx="8" cy="10" r="3"/>
+                    </g>
+                  </g>
+
                   <!-- counterweight -->
-                  <rect id="counter" x="-36" y="-12" width="64" height="36" rx="6" fill="url(#yellow)"></rect>
+                  <rect id="counter" x="-36" y="-12" width="64" height="36" rx="6" fill="url(#gYellow)"></rect>
 
                   <!-- hook group -->
                   <g id="hookGroup" transform="translate(480,6)">
                     <rect id="cable" x="0" y="0" width="3" height="120" fill="#94a3b8"></rect>
                     <g id="hookBody" transform="translate(-10,120)">
                       <rect x="0" y="0" width="22" height="22" rx="4" fill="#071226" stroke="#CBD5E1" stroke-width="3"></rect>
-                      <!-- small detail -->
                       <rect x="4" y="4" width="14" height="6" rx="2" fill="#0b1220"></rect>
+                      <g id="hookDetail" fill="#94a3b8" opacity="0.6">
+                        <circle cx="6" cy="12" r="1.2"/><circle cx="16" cy="12" r="1.2"/>
+                      </g>
                     </g>
                   </g>
                 </g>
               </g>
 
-              <!-- building under construction (floors layered) -->
+              <!-- building under construction -->
               <g id="building" transform="translate(520,120)">
-                <!-- scaffolding -->
                 <g id="scaffold" opacity="0.06">
-                  <rect x="-20" y="0" width="300" height="320" fill="url(#steel)"></rect>
+                  <rect x="-20" y="0" width="300" height="320" fill="url(#gSteel)"></rect>
                 </g>
-                <!-- floors (will be animated individually) -->
-                <g id="floorsGroup">
-                  <!-- floors created by JS for many layers -->
+                <g id="floorsGroup"></g>
+                <!-- scaffolding ropes -->
+                <g id="safetyNet" transform="translate(10,220)" opacity="0.9">
+                  <rect x="0" y="0" width="240" height="36" rx="6" fill="url(#gYellow)" opacity="0.06"></rect>
                 </g>
               </g>
 
@@ -143,10 +146,8 @@
               <ellipse cx="450" cy="480" rx="420" ry="28" fill="rgba(0,0,0,0.25)"></ellipse>
             </svg>
 
-            <!-- HTML props layered over SVG for depth (toolbox, mixer, vehicles) -->
-            <div class="props-layer" id="constructionProps" aria-hidden="true">
-              <!-- many elements will be injected by JS: workers, vehicles, dust, sparks -->
-            </div>
+            <!-- HTML props layer (workers, vehicles, dust, sparks) -->
+            <div class="props-layer" id="constructionProps" aria-hidden="true"></div>
           </div>
         </article>
 
@@ -155,52 +156,39 @@
           <h2 id="electrical-title" class="panel-title">High Voltage Maintenance</h2>
 
           <div class="scene scene--electrical" id="electricalScene" role="img" aria-label="Electrical maintenance room">
-            <!-- Inline SVG transformer + switchgear (layered) -->
             <svg id="electricalSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="electrical-svg" aria-hidden="true">
               <defs>
-                <linearGradient id="cabinet" x1="0" x2="1">
-                  <stop offset="0" stop-color="#0b1220"/>
-                  <stop offset="1" stop-color="#111827"/>
-                </linearGradient>
-                <linearGradient id="copper" x1="0" x2="1">
-                  <stop offset="0" stop-color="#f59e0b"/>
-                  <stop offset="1" stop-color="#b45309"/>
-                </linearGradient>
-                <filter id="glowBlue" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="6" result="b"/>
-                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
+                <linearGradient id="cabinetGrad" x1="0" x2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#111827"/></linearGradient>
+                <linearGradient id="copperGrad" x1="0" x2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#b45309"/></linearGradient>
+                <filter id="blueGlow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
               </defs>
 
               <!-- transformer -->
               <g id="transformer" transform="translate(60,80)">
-                <rect x="0" y="0" width="220" height="320" rx="10" fill="url(#cabinet)"></rect>
-                <!-- coils -->
+                <rect x="0" y="0" width="220" height="320" rx="10" fill="url(#cabinetGrad)"></rect>
                 <g id="coils" transform="translate(24,36)">
                   <rect x="0" y="0" width="172" height="40" rx="6" fill="#071226"></rect>
                   <rect x="0" y="56" width="172" height="40" rx="6" fill="#071226"></rect>
                   <rect x="0" y="112" width="172" height="40" rx="6" fill="#071226"></rect>
                 </g>
-                <!-- high-voltage insulators -->
                 <g id="insulators" transform="translate(12,12)">
                   <rect x="0" y="0" width="12" height="12" rx="2" fill="#94a3b8"></rect>
                   <rect x="196" y="0" width="12" height="12" rx="2" fill="#94a3b8"></rect>
                 </g>
-              </g>
-
-              <!-- switchgear bank -->
-              <g id="switchgear" transform="translate(320,80)">
-                <rect x="0" y="0" width="240" height="320" rx="10" fill="url(#cabinet)"></rect>
-                <!-- many breakers (animated LEDs) -->
-                <g id="breakers" transform="translate(16,16)">
-                  <!-- breakers created by JS -->
+                <g id="warning" transform="translate(12,260)">
+                  <rect x="0" y="0" width="196" height="36" rx="6" fill="#111827"></rect>
+                  <text x="98" y="24" font-size="12" fill="#F59E0B" text-anchor="middle" font-family="sans-serif">HIGH VOLTAGE</text>
                 </g>
               </g>
 
-              <!-- cable trays -->
-              <g id="cableTrays" transform="translate(0,0)">
-                <!-- trays created by JS -->
+              <!-- switchgear -->
+              <g id="switchgear" transform="translate(320,80)">
+                <rect x="0" y="0" width="240" height="320" rx="10" fill="url(#cabinetGrad)"></rect>
+                <g id="breakers" transform="translate(16,16)"></g>
               </g>
+
+              <!-- cable trays -->
+              <g id="cableTrays" transform="translate(0,0)"></g>
 
               <!-- oscilloscope -->
               <g id="osc" transform="translate(620,80)">
@@ -211,7 +199,6 @@
               </g>
             </svg>
 
-            <!-- HTML overlay for electricians, sparks, fans -->
             <div class="electrical-overlay" id="electricalProps" aria-hidden="true"></div>
           </div>
         </article>
@@ -221,37 +208,21 @@
           <h2 id="infra-title" class="panel-title">Server & Pipeline Infrastructure</h2>
 
           <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room and pipelines">
-            <!-- Inline SVG server rack cluster -->
             <svg id="infraSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="infra-svg" aria-hidden="true">
               <defs>
-                <linearGradient id="rackGrad" x1="0" x2="1">
-                  <stop offset="0" stop-color="#071226"/>
-                  <stop offset="1" stop-color="#0f1724"/>
-                </linearGradient>
-                <linearGradient id="ledGrad" x1="0" x2="1">
-                  <stop offset="0" stop-color="#10B981"/>
-                  <stop offset="1" stop-color="#3B82F6"/>
-                </linearGradient>
+                <linearGradient id="rackGrad" x1="0" x2="1"><stop offset="0" stop-color="#071226"/><stop offset="1" stop-color="#0f1724"/></linearGradient>
+                <linearGradient id="ledGrad" x1="0" x2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
               </defs>
 
-              <!-- multiple racks -->
-              <g id="racks" transform="translate(40,40)">
-                <!-- racks created by JS for many units -->
-              </g>
+              <g id="racks" transform="translate(40,40)"></g>
+              <g id="pipes" transform="translate(420,220)"></g>
 
-              <!-- pipelines -->
-              <g id="pipes" transform="translate(420,220)">
-                <!-- pipes created by JS -->
-              </g>
-
-              <!-- cloud sync icon (animated) -->
               <g id="cloudSync" transform="translate(720,60)">
                 <path d="M10 40 a20 20 0 0 1 40 0 h20 a20 20 0 0 1 0 40 H10 z" fill="#94a3b8" opacity="0.06"></path>
                 <rect x="8" y="48" width="64" height="6" rx="3" fill="#3B82F6" opacity="0.12"></rect>
               </g>
             </svg>
 
-            <!-- HTML overlay for engineers, packets, gauges -->
             <div class="infra-overlay" id="infraProps" aria-hidden="true"></div>
           </div>
         </article>
@@ -298,7 +269,6 @@
     </main>
   </div>
 
-  <!-- Scripts -->
   <script src="js/script.js" defer></script>
 </body>
 </html>
