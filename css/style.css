@@ -1,12 +1,13 @@
 /* css/style.css
-   Premium production CSS
-   - Design tokens
-   - Layout and responsive rules
-   - Base visuals for SVG overlays and HTML props
+   Phase 1: Design tokens, layout, glass UI, responsive rules
+   - Well-commented and organized for extension in later phases
 */
 
-/* Design tokens */
+/* =========================
+   Design tokens / variables
+   ========================= */
 :root{
+  /* Palette */
   --bg: #0B1220;
   --card: #182235;
   --accent: #F59E0B;
@@ -16,6 +17,7 @@
   --text: #FFFFFF;
   --muted: #CBD5E1;
 
+  /* Layout */
   --max-width: 1280px;
   --radius: 14px;
   --glass-alpha: 0.06;
@@ -23,26 +25,35 @@
   --shadow-1: 0 8px 30px rgba(2,6,23,0.6);
   --shadow-2: 0 18px 60px rgba(2,6,23,0.75);
 
+  /* Motion */
   --ease: cubic-bezier(.2,.9,.3,1);
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* Reset & base */
+/* =========================
+   Base reset & layout
+   ========================= */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
   margin:0;
-  font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family:var(--font-sans);
   background:var(--bg);
   color:var(--text);
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
+  line-height:1.35;
   overflow-x:hidden;
 }
 
 /* App container */
 .app{min-height:100vh; display:flex; flex-direction:column; align-items:center; position:relative;}
 
-/* Background */
+/* =========================
+   Background layers
+   ========================= */
 .bg{position:fixed; inset:0; z-index:0; pointer-events:none}
 .bg-gradient{
   position:absolute; inset:0;
@@ -54,6 +65,8 @@ body{
   animation:gradientShift 20s linear infinite;
   opacity:0.95;
 }
+
+/* Blueprint grid overlay */
 .blueprint-grid{
   position:absolute; inset:0;
   background-image:
@@ -65,11 +78,14 @@ body{
   transform:translateZ(0);
   animation:gridDrift 28s linear infinite;
 }
+
+/* Volumetric beams */
 .volumetric .beam{position:absolute; width:420px; height:420px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,255,255,0.03), transparent 40%); filter:blur(40px); mix-blend-mode:screen; opacity:0.6}
 .volumetric .beam--1{left:6%; top:6%; animation:lightDrift 24s linear infinite}
 .volumetric .beam--2{right:8%; top:12%; width:520px;height:520px; animation:lightDrift 32s linear infinite}
 .volumetric .beam--3{left:40%; top:2%; width:360px;height:360px; animation:lightDrift 20s linear infinite}
 
+/* Decorative objects */
 .bg-objects .gear{position:absolute; border-radius:50%; border:6px solid rgba(255,255,255,0.03); box-shadow:inset 0 0 18px rgba(255,255,255,0.02)}
 .bg-objects .g--1{left:6%; top:60%; width:84px;height:84px; animation:gearSpin 12s linear infinite}
 .bg-objects .g--2{right:8%; top:40%; width:56px;height:56px; animation:gearSpin 9s linear reverse infinite}
@@ -77,11 +93,16 @@ body{
 .bg-objects .s--1{left:20%; top:10%; animation:twinkle 6s linear infinite}
 .bg-objects .s--2{right:20%; top:30%; animation:twinkle 8s linear infinite}
 
+/* Canvas for particles (JS-driven) */
 .bg-particles{position:absolute; inset:0; z-index:1; opacity:0.95}
+
+/* Fog & lens */
 .fog-layer{position:absolute; left:-10%; bottom:6%; width:1400px;height:220px; background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent); filter:blur(30px); animation:fogMove 22s linear infinite; opacity:0.45}
 .lensflare{position:absolute; left:50%; top:6%; width:600px;height:600px; transform:translateX(-50%); background:radial-gradient(closest-side, rgba(255,255,255,0.02), transparent 40%); filter:blur(40px); mix-blend-mode:screen; opacity:0.5}
 
-/* Header */
+/* =========================
+   Header / Hero
+   ========================= */
 .header{position:relative; z-index:10; width:100%; display:flex; justify-content:center; padding:28px 20px 6px}
 .header-inner{max-width:var(--max-width); width:100%; display:flex; flex-direction:column; align-items:center; gap:12px}
 .brand{background:transparent; border:0; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:6px; border-radius:10px; box-shadow:var(--shadow-1); transition:transform 220ms var(--ease)}
@@ -90,11 +111,13 @@ body{
 .subtitle{margin:6px 0 0; color:var(--muted); font-weight:600; text-align:center}
 .subdesc{margin:6px 0 0; color:var(--muted); text-align:center; max-width:880px}
 
-/* Main layout */
+/* =========================
+   Main layout: panels + side
+   ========================= */
 .main{position:relative; z-index:10; width:100%; max-width:var(--max-width); margin:18px auto; padding:18px; display:grid; grid-template-columns: 1fr 360px; gap:20px; align-items:start}
 .panels{display:grid; grid-template-columns: repeat(3, 1fr); gap:18px}
 
-/* Panel base */
+/* Panel base (glass card) */
 .panel{
   position:relative;
   border-radius:var(--radius);
@@ -111,27 +134,49 @@ body{
 .panel:focus{outline:2px solid rgba(59,130,246,0.08)}
 .panel:hover{transform:translateY(-8px) rotateX(1deg); box-shadow:var(--shadow-2)}
 .panel-title{margin:0 0 10px 0; color:var(--muted); font-weight:700; font-size:0.95rem}
+
+/* Scenes common */
 .scene{position:relative; height:420px; display:block; perspective:1400px}
 
-/* Construction scene */
-.scene--construction{background:linear-gradient(180deg, rgba(245,158,11,0.01), transparent); border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25)}
+/* Construction scene base visuals */
+.scene--construction{
+  background:
+    linear-gradient(180deg, rgba(245,158,11,0.01), transparent),
+    radial-gradient(600px 200px at 20% 10%, rgba(59,130,246,0.02), transparent 10%);
+  border-radius:10px; padding:8px; overflow:hidden;
+  box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+}
 .crane-svg{width:100%; height:100%; display:block}
 .props-layer{position:absolute; inset:0; pointer-events:none; z-index:60}
 
-/* Electrical scene */
-.scene--electrical{background:linear-gradient(180deg, rgba(59,130,246,0.02), transparent); border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25)}
+/* Electrical scene base visuals */
+.scene--electrical{
+  background:
+    linear-gradient(180deg, rgba(59,130,246,0.02), transparent),
+    radial-gradient(400px 160px at 80% 10%, rgba(245,158,11,0.02), transparent 10%);
+  border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+}
 .electrical-svg{width:100%; height:100%; display:block}
 .electrical-overlay{position:absolute; inset:0; pointer-events:none; z-index:60}
 
-/* Infra scene */
-.scene--infra{background:linear-gradient(180deg, rgba(16,185,129,0.01), transparent); border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25)}
+/* Infrastructure scene base visuals */
+.scene--infra{
+  background:
+    linear-gradient(180deg, rgba(16,185,129,0.01), transparent),
+    radial-gradient(500px 200px at 10% 10%, rgba(59,130,246,0.02), transparent 10%);
+  border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+}
 .infra-svg{width:100%; height:100%; display:block}
 .infra-overlay{position:absolute; inset:0; pointer-events:none; z-index:60}
 
-/* Props base */
+/* =========================
+   Props & small elements (Phase 1 placeholders)
+   ========================= */
 .prop { position:absolute; transform-origin:center; will-change:transform,opacity; }
 
-/* Right column */
+/* =========================
+   Side cards: progress + contact
+   ========================= */
 .side{display:flex; flex-direction:column; gap:18px; align-items:stretch}
 .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; border:1px solid var(--glass-border); box-shadow:var(--shadow-1); backdrop-filter: blur(8px) saturate(120%)}
 .card--progress{position:sticky; top:28px}
@@ -142,15 +187,23 @@ body{
 .progress-glow{position:absolute; left:0; top:-6px; height:26px; width:40%; background:linear-gradient(90deg, rgba(59,130,246,0.12), rgba(245,158,11,0.12)); filter:blur(18px); opacity:0.9; transform:translateX(-10%); animation:glowSweep 3.6s linear infinite}
 .progress-fill{position:absolute; left:0; top:0; bottom:0; width:61%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); box-shadow:0 12px 40px rgba(59,130,246,0.08); transition:width 1.2s var(--ease)}
 .status-rotator{margin-top:12px; color:var(--muted); font-weight:700; min-height:28px; display:flex; align-items:center}
+
+/* Live grid */
 .live-grid{margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px; color:var(--muted); font-size:0.95rem}
 .live-row{display:flex; justify-content:space-between; gap:8px}
 .label{opacity:0.9}
 .value{font-weight:700; color:var(--text)}
+
+/* Contact card */
 .card--contact .contact{display:flex; flex-direction:column; gap:8px}
 .contact-mail{color:var(--accent-2); text-decoration:none; font-weight:700}
+
+/* Footer note */
 .footer-note{margin-top:12px; color:var(--muted); font-size:0.85rem}
 
-/* Responsive */
+/* =========================
+   Responsive
+   ========================= */
 @media (max-width:1100px){
   .main{grid-template-columns: 1fr; padding:12px}
   .panels{grid-template-columns: 1fr; grid-auto-rows:auto}
@@ -158,5 +211,12 @@ body{
   .card--progress{position:relative; top:auto}
 }
 
-/* Accessibility focus */
+/* =========================
+   Accessibility focus states
+   ========================= */
 button:focus, .panel:focus, .card:focus{outline:3px solid rgba(59,130,246,0.12); outline-offset:6px}
+
+/* =========================
+   Utility classes
+   ========================= */
+.hidden{display:none}
