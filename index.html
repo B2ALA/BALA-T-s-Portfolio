@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Premium cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
+  <meta name="description" content="Cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
   <title>Website Under Maintenance — Upgrading Now</title>
 
   <!-- Styles -->
@@ -16,43 +16,50 @@
 <body>
   <div id="app" class="app" aria-live="polite">
 
-    <!-- Background layers (parallax, fog, blueprint grid, lights, particles) -->
+    <!-- BACKGROUND LAYERS -->
     <div class="bg" aria-hidden="true">
       <div class="bg-gradient"></div>
       <div class="blueprint-grid"></div>
-      <div class="bg-lights">
-        <div class="beam b1"></div>
-        <div class="beam b2"></div>
-        <div class="beam b3"></div>
+
+      <!-- volumetric lights -->
+      <div class="volumetric">
+        <div class="beam beam--1"></div>
+        <div class="beam beam--2"></div>
+        <div class="beam beam--3"></div>
       </div>
+
+      <!-- decorative gears & stars -->
       <div class="bg-objects">
-        <div class="gear g1"></div>
-        <div class="gear g2"></div>
-        <div class="star s1"></div>
-        <div class="star s2"></div>
+        <div class="gear g--1"></div>
+        <div class="gear g--2"></div>
+        <div class="star s--1"></div>
+        <div class="star s--2"></div>
       </div>
-      <canvas id="bgCanvas" class="bg-canvas"></canvas>
-      <div class="lensflare"></div>
+
+      <!-- canvas particles (JS) -->
+      <canvas id="bgParticles" class="bg-particles"></canvas>
+
       <div class="fog-layer"></div>
+      <div class="lensflare"></div>
     </div>
 
-    <!-- Header / Hero -->
+    <!-- HEADER / HERO -->
     <header class="header" role="banner" aria-label="Maintenance header">
       <div class="header-inner">
         <button class="brand" aria-label="Your Company Home" title="Your Company" tabindex="0">
-          <!-- Premium SVG logo -->
+          <!-- Inline SVG logo (premium gradient + glow) -->
           <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
             <defs>
-              <linearGradient id="lgA" x1="0" x2="1">
+              <linearGradient id="logoGrad" x1="0" x2="1">
                 <stop offset="0" stop-color="#3B82F6"/>
                 <stop offset="1" stop-color="#F59E0B"/>
               </linearGradient>
-              <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <filter id="logoGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="6" result="b"/>
                 <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
               </filter>
             </defs>
-            <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#lgA)" filter="url(#fGlow)"></rect>
+            <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#logoGrad)" filter="url(#logoGlow)"></rect>
             <path d="M20 38 L32 22 L44 38 Z" fill="#071226" opacity="0.98"></path>
           </svg>
         </button>
@@ -65,31 +72,193 @@
       </div>
     </header>
 
-    <!-- Main content: three cinematic panels + progress card -->
+    <!-- MAIN: 3 SCENES + PROGRESS -->
     <main class="main" role="main" aria-label="Maintenance activities">
       <section class="panels" aria-live="polite">
 
-        <!-- Panel 1: Construction (container only; elements created by JS) -->
+        <!-- PANEL 1: CONSTRUCTION -->
         <article id="constructionPanel" class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0">
           <h2 id="construction-title" class="panel-title">Construction Department</h2>
-          <div class="scene scene--construction" id="constructionScene" role="img" aria-label="Construction site with crane, vehicles, workers and building"></div>
+
+          <!-- Inline SVG crane + layered scene (detailed, animated via CSS/JS) -->
+          <div class="scene scene--construction" id="constructionScene" role="img" aria-label="Construction site">
+            <!-- Detailed SVG crane (layered groups for animation) -->
+            <svg id="craneSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="crane-svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="steel" x1="0" x2="1">
+                  <stop offset="0" stop-color="#2b3946"/>
+                  <stop offset="1" stop-color="#0b1220"/>
+                </linearGradient>
+                <linearGradient id="yellow" x1="0" x2="1">
+                  <stop offset="0" stop-color="#F59E0B"/>
+                  <stop offset="1" stop-color="#b45309"/>
+                </linearGradient>
+                <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000" flood-opacity="0.45"/>
+                </filter>
+              </defs>
+
+              <!-- tower -->
+              <g id="tower" transform="translate(120,60)">
+                <rect x="0" y="0" width="28" height="360" rx="6" fill="url(#steel)"></rect>
+                <!-- cross braces -->
+                <g id="braces" fill="none" stroke="#0f1724" stroke-width="4" opacity="0.12">
+                  <path d="M0,0 L28,40 M0,40 L28,80 M0,80 L28,120 M0,120 L28,160 M0,160 L28,200 M0,200 L28,240 M0,240 L28,280 M0,280 L28,320"></path>
+                </g>
+              </g>
+
+              <!-- arm group (rotates) -->
+              <g id="armGroup" transform="translate(148,80)">
+                <g id="arm" transform="rotate(-6)">
+                  <rect x="0" y="0" width="520" height="18" rx="8" fill="url(#steel)"></rect>
+                  <rect x="12" y="4" width="496" height="6" rx="3" fill="rgba(255,255,255,0.02)"></rect>
+                  <!-- counterweight -->
+                  <rect id="counter" x="-36" y="-12" width="64" height="36" rx="6" fill="url(#yellow)"></rect>
+
+                  <!-- hook group -->
+                  <g id="hookGroup" transform="translate(480,6)">
+                    <rect id="cable" x="0" y="0" width="3" height="120" fill="#94a3b8"></rect>
+                    <g id="hookBody" transform="translate(-10,120)">
+                      <rect x="0" y="0" width="22" height="22" rx="4" fill="#071226" stroke="#CBD5E1" stroke-width="3"></rect>
+                      <!-- small detail -->
+                      <rect x="4" y="4" width="14" height="6" rx="2" fill="#0b1220"></rect>
+                    </g>
+                  </g>
+                </g>
+              </g>
+
+              <!-- building under construction (floors layered) -->
+              <g id="building" transform="translate(520,120)">
+                <!-- scaffolding -->
+                <g id="scaffold" opacity="0.06">
+                  <rect x="-20" y="0" width="300" height="320" fill="url(#steel)"></rect>
+                </g>
+                <!-- floors (will be animated individually) -->
+                <g id="floorsGroup">
+                  <!-- floors created by JS for many layers -->
+                </g>
+              </g>
+
+              <!-- ground shadow -->
+              <ellipse cx="450" cy="480" rx="420" ry="28" fill="rgba(0,0,0,0.25)"></ellipse>
+            </svg>
+
+            <!-- HTML props layered over SVG for depth (toolbox, mixer, vehicles) -->
+            <div class="props-layer" id="constructionProps" aria-hidden="true">
+              <!-- many elements will be injected by JS: workers, vehicles, dust, sparks -->
+            </div>
+          </div>
         </article>
 
-        <!-- Panel 2: Electrical -->
+        <!-- PANEL 2: ELECTRICAL -->
         <article id="electricalPanel" class="panel panel--glass panel--electrical" aria-labelledby="electrical-title" tabindex="0">
           <h2 id="electrical-title" class="panel-title">High Voltage Maintenance</h2>
-          <div class="scene scene--electrical" id="electricalScene" role="img" aria-label="Electrical maintenance room with transformers, panels, and electricians"></div>
+
+          <div class="scene scene--electrical" id="electricalScene" role="img" aria-label="Electrical maintenance room">
+            <!-- Inline SVG transformer + switchgear (layered) -->
+            <svg id="electricalSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="electrical-svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="cabinet" x1="0" x2="1">
+                  <stop offset="0" stop-color="#0b1220"/>
+                  <stop offset="1" stop-color="#111827"/>
+                </linearGradient>
+                <linearGradient id="copper" x1="0" x2="1">
+                  <stop offset="0" stop-color="#f59e0b"/>
+                  <stop offset="1" stop-color="#b45309"/>
+                </linearGradient>
+                <filter id="glowBlue" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="6" result="b"/>
+                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+
+              <!-- transformer -->
+              <g id="transformer" transform="translate(60,80)">
+                <rect x="0" y="0" width="220" height="320" rx="10" fill="url(#cabinet)"></rect>
+                <!-- coils -->
+                <g id="coils" transform="translate(24,36)">
+                  <rect x="0" y="0" width="172" height="40" rx="6" fill="#071226"></rect>
+                  <rect x="0" y="56" width="172" height="40" rx="6" fill="#071226"></rect>
+                  <rect x="0" y="112" width="172" height="40" rx="6" fill="#071226"></rect>
+                </g>
+                <!-- high-voltage insulators -->
+                <g id="insulators" transform="translate(12,12)">
+                  <rect x="0" y="0" width="12" height="12" rx="2" fill="#94a3b8"></rect>
+                  <rect x="196" y="0" width="12" height="12" rx="2" fill="#94a3b8"></rect>
+                </g>
+              </g>
+
+              <!-- switchgear bank -->
+              <g id="switchgear" transform="translate(320,80)">
+                <rect x="0" y="0" width="240" height="320" rx="10" fill="url(#cabinet)"></rect>
+                <!-- many breakers (animated LEDs) -->
+                <g id="breakers" transform="translate(16,16)">
+                  <!-- breakers created by JS -->
+                </g>
+              </g>
+
+              <!-- cable trays -->
+              <g id="cableTrays" transform="translate(0,0)">
+                <!-- trays created by JS -->
+              </g>
+
+              <!-- oscilloscope -->
+              <g id="osc" transform="translate(620,80)">
+                <rect x="0" y="0" width="220" height="120" rx="8" fill="#071226"></rect>
+                <g id="trace" transform="translate(12,56)">
+                  <rect x="-40" y="0" width="300" height="2" fill="rgba(59,130,246,0.6)"></rect>
+                </g>
+              </g>
+            </svg>
+
+            <!-- HTML overlay for electricians, sparks, fans -->
+            <div class="electrical-overlay" id="electricalProps" aria-hidden="true"></div>
+          </div>
         </article>
 
-        <!-- Panel 3: Infrastructure / Server -->
+        <!-- PANEL 3: INFRASTRUCTURE / SERVER -->
         <article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0">
           <h2 id="infra-title" class="panel-title">Server & Pipeline Infrastructure</h2>
-          <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room with racks, pipelines, and network activity"></div>
+
+          <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room and pipelines">
+            <!-- Inline SVG server rack cluster -->
+            <svg id="infraSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="infra-svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="rackGrad" x1="0" x2="1">
+                  <stop offset="0" stop-color="#071226"/>
+                  <stop offset="1" stop-color="#0f1724"/>
+                </linearGradient>
+                <linearGradient id="ledGrad" x1="0" x2="1">
+                  <stop offset="0" stop-color="#10B981"/>
+                  <stop offset="1" stop-color="#3B82F6"/>
+                </linearGradient>
+              </defs>
+
+              <!-- multiple racks -->
+              <g id="racks" transform="translate(40,40)">
+                <!-- racks created by JS for many units -->
+              </g>
+
+              <!-- pipelines -->
+              <g id="pipes" transform="translate(420,220)">
+                <!-- pipes created by JS -->
+              </g>
+
+              <!-- cloud sync icon (animated) -->
+              <g id="cloudSync" transform="translate(720,60)">
+                <path d="M10 40 a20 20 0 0 1 40 0 h20 a20 20 0 0 1 0 40 H10 z" fill="#94a3b8" opacity="0.06"></path>
+                <rect x="8" y="48" width="64" height="6" rx="3" fill="#3B82F6" opacity="0.12"></rect>
+              </g>
+            </svg>
+
+            <!-- HTML overlay for engineers, packets, gauges -->
+            <div class="infra-overlay" id="infraProps" aria-hidden="true"></div>
+          </div>
         </article>
 
       </section>
 
-      <!-- Right column: progress + live info -->
+      <!-- RIGHT COLUMN: PROGRESS + LIVE INFO -->
       <aside class="side" aria-label="Progress and live information">
         <div class="card card--progress" role="status" aria-live="polite" tabindex="0">
           <div class="card-head">
