@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Premium cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
+  <title>Website Under Maintenance — Upgrading Now</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+
+  <!-- Accessibility / SEO -->
+  <meta name="robots" content="noindex,follow" />
+</head>
+<body>
+  <div id="app" class="app">
+    <!-- Decorative background layers (pure HTML/CSS + canvas for particles) -->
+    <div class="bg-layer">
+      <div class="bg-gradient"></div>
+      <div class="blueprint-grid" aria-hidden="true"></div>
+      <div class="volumetric-lights" aria-hidden="true">
+        <div class="light l1"></div>
+        <div class="light l2"></div>
+        <div class="light l3"></div>
+      </div>
+      <div class="floating-objects" aria-hidden="true">
+        <div class="gear g1"></div>
+        <div class="gear g2"></div>
+        <div class="geo geo1"></div>
+        <div class="geo geo2"></div>
+      </div>
+      <canvas id="bgParticles" class="bg-particles" aria-hidden="true"></canvas>
+      <div class="lensflare" aria-hidden="true"></div>
+      <div class="fog" aria-hidden="true"></div>
+    </div>
+
+    <!-- Header / Hero -->
+    <header class="header" role="banner" aria-label="Maintenance header">
+      <div class="header-inner">
+        <button class="brand" aria-label="Your Company Home" title="Your Company" tabindex="0">
+          <!-- SVG logo built with CSS-friendly shapes -->
+          <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="lg" x1="0" x2="1">
+                <stop offset="0" stop-color="#3B82F6"/>
+                <stop offset="1" stop-color="#F59E0B"/>
+              </linearGradient>
+            </defs>
+            <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#lg)"></rect>
+            <path d="M20 38 L32 22 L44 38 Z" fill="#071226" opacity="0.95"></path>
+          </svg>
+        </button>
+
+        <div class="hero-text" role="heading" aria-level="1">
+          <h1 class="title">🚧 WEBSITE UNDER MAINTENANCE</h1>
+          <p class="subtitle">We're building something amazing for you.</p>
+          <p class="subdesc">Our engineers are working around the clock to improve your experience. Thank you for your patience.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content: three cinematic panels + progress card -->
+    <main class="main" role="main" aria-label="Maintenance activities">
+      <section class="panels" aria-live="polite">
+        <!-- Panel 1: Construction -->
+        <article class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0">
+          <h2 id="construction-title" class="panel-title">Construction Department</h2>
+
+          <div class="scene scene--construction" role="img" aria-label="Construction site with crane, workers and building">
+            <!-- Crane assembly -->
+            <div class="crane" aria-hidden="true">
+              <div class="crane-base"></div>
+              <div class="crane-tower"></div>
+              <div class="crane-arm">
+                <div class="counterweight"></div>
+                <div class="arm-rail"></div>
+                <div class="hook">
+                  <div class="hook-line"></div>
+                  <div class="hook-body"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Building floors (animated growth) -->
+            <div class="building" aria-hidden="true">
+              <div class="scaffold"></div>
+              <div class="floors">
+                <div class="floor f1"></div>
+                <div class="floor f2"></div>
+                <div class="floor f3"></div>
+                <div class="floor f4"></div>
+                <div class="floor f5"></div>
+              </div>
+            </div>
+
+            <!-- Workers & props -->
+            <div class="construction-props" aria-hidden="true">
+              <div class="worker worker--walk"></div>
+              <div class="worker worker--carry"></div>
+              <div class="wheelbarrow"></div>
+              <div class="toolbox"></div>
+              <div class="concrete-mixer"></div>
+              <div class="cones">
+                <span class="cone"></span><span class="cone"></span><span class="cone"></span>
+              </div>
+              <div class="caution-tape">CAUTION</div>
+              <div class="warning-light"></div>
+              <div class="dust-cloud"></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Panel 2: Electrical -->
+        <article class="panel panel--glass panel--electrical" aria-labelledby="electrical-title" tabindex="0">
+          <h2 id="electrical-title" class="panel-title">Electrical Maintenance</h2>
+
+          <div class="scene scene--electrical" role="img" aria-label="Electrical upgrade with cables, sparks and control panel">
+            <div class="ladder" aria-hidden="true"></div>
+            <div class="electrician" aria-hidden="true"></div>
+
+            <div class="cable-bank" aria-hidden="true">
+              <div class="cable c1"></div>
+              <div class="cable c2"></div>
+              <div class="cable c3"></div>
+            </div>
+
+            <div class="control-rack" aria-hidden="true">
+              <div class="oscilloscope"></div>
+              <div class="led-row">
+                <span class="led green"></span>
+                <span class="led blue"></span>
+                <span class="led amber"></span>
+              </div>
+              <div class="fuse-slot"></div>
+              <div class="fan"></div>
+            </div>
+
+            <div class="sparks"></div>
+            <div class="bulb"></div>
+            <div class="electro-sign">⚡ HIGH VOLTAGE</div>
+          </div>
+        </article>
+
+        <!-- Panel 3: Infrastructure -->
+        <article class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0">
+          <h2 id="infra-title" class="panel-title">Server & Network Infrastructure</h2>
+
+          <div class="scene scene--infra" role="img" aria-label="Server racks, network cables, pipelines and cloud sync">
+            <div class="server-rack" aria-hidden="true">
+              <div class="server s1">
+                <div class="s-led s1"></div>
+                <div class="s-led s2"></div>
+                <div class="s-led s3"></div>
+              </div>
+              <div class="server s2">
+                <div class="s-led s1"></div>
+                <div class="s-led s2"></div>
+                <div class="s-led s3"></div>
+              </div>
+            </div>
+
+            <div class="engineer" aria-hidden="true">
+              <div class="engineer-body"></div>
+              <div class="wrench"></div>
+            </div>
+
+            <div class="network-visual" aria-hidden="true">
+              <div class="ethernet"></div>
+              <div class="packets">
+                <span class="packet p1"></span>
+                <span class="packet p2"></span>
+                <span class="packet p3"></span>
+              </div>
+              <div class="cloud-sync"></div>
+            </div>
+
+            <div class="pipeline">
+              <div class="pipe">
+                <div class="liquid"></div>
+              </div>
+              <div class="gearset">
+                <div class="gear gA"></div>
+                <div class="gear gB"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Right column: progress + live info -->
+      <aside class="side" aria-label="Progress and live information">
+        <div class="card card--progress" role="status" aria-live="polite" tabindex="0">
+          <div class="card-head">
+            <h3 class="card-title">Overall Upgrade Progress</h3>
+            <div class="progress-percent" id="progressPercent">61%</div>
+          </div>
+
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-glow"></div>
+            <div class="progress-fill" id="progressFill" style="width:61%"></div>
+          </div>
+
+          <div class="status-rotator" id="statusRotator" aria-live="polite">Installing New Features...</div>
+
+          <div class="live-grid" aria-hidden="false">
+            <div class="live-row"><span class="label">Current Date</span><span id="liveDate" class="value">—</span></div>
+            <div class="live-row"><span class="label">Current Time</span><span id="liveTime" class="value">—</span></div>
+            <div class="live-row"><span class="label">Day</span><span id="liveDay" class="value">—</span></div>
+            <div class="live-row"><span class="label">Estimated Completion</span><span id="liveEst" class="value">—</span></div>
+            <div class="live-row"><span class="label">Website Status</span><span id="liveSite" class="value">Online after maintenance</span></div>
+            <div class="live-row"><span class="label">Server Status</span><span id="liveServer" class="value">Degraded → Upgrading</span></div>
+            <div class="live-row"><span class="label">Network Status</span><span id="liveNet" class="value">Active</span></div>
+            <div class="live-row"><span class="label">Maintenance Phase</span><span id="livePhase" class="value">Deploying</span></div>
+            <div class="live-row"><span class="label">Last Update</span><span id="liveUpdate" class="value">—</span></div>
+          </div>
+        </div>
+
+        <div class="card card--contact" role="contentinfo" aria-label="Support contact">
+          <div class="contact">
+            <div class="contact-title">Need immediate assistance?</div>
+            <a class="contact-mail" href="mailto:support@yourcompany.com">support@yourcompany.com</a>
+            <div class="contact-phone">+91 XXXXX XXXXX</div>
+          </div>
+          <div class="footer-note">© 2026 Your Company Name — We'll be back soon.</div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/script.js" defer></script>
+</body>
+</html>
