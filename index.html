@@ -6,7 +6,6 @@
   <meta name="description" content="Cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
   <title>Website Under Maintenance — Upgrading Now</title>
 
-  <!-- Phase 1 styles -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
 
@@ -15,34 +14,31 @@
 <body>
   <div id="app" class="app" aria-live="polite">
 
-    <!-- BACKGROUND LAYERS -->
+    <!-- BACKGROUND (unchanged) -->
     <div class="bg" aria-hidden="true">
       <div class="bg-gradient"></div>
-      <div class="blueprint-grid" aria-hidden="true"></div>
-
-      <div class="volumetric" aria-hidden="true">
+      <div class="blueprint-grid"></div>
+      <div class="volumetric">
         <div class="beam beam--1"></div>
         <div class="beam beam--2"></div>
         <div class="beam beam--3"></div>
       </div>
-
-      <div class="bg-objects" aria-hidden="true">
+      <div class="bg-objects">
         <div class="gear g--1"></div>
         <div class="gear g--2"></div>
         <div class="star s--1"></div>
         <div class="star s--2"></div>
       </div>
-
-      <canvas id="bgParticles" class="bg-particles" aria-hidden="true"></canvas>
-      <div class="fog-layer" aria-hidden="true"></div>
-      <div class="lensflare" aria-hidden="true"></div>
+      <canvas id="bgParticles" class="bg-particles"></canvas>
+      <div class="fog-layer"></div>
+      <div class="lensflare"></div>
     </div>
 
-    <!-- HEADER / HERO -->
+    <!-- HEADER / HERO (unchanged) -->
     <header class="header" role="banner" aria-label="Maintenance header">
       <div class="header-inner">
         <button class="brand" aria-label="Your Company Home" title="Your Company" tabindex="0">
-          <!-- Inline SVG logo (premium gradient + glow) -->
+          <!-- Inline SVG logo -->
           <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
             <defs>
               <linearGradient id="logoGrad" x1="0" x2="1">
@@ -71,124 +67,74 @@
     <main class="main" role="main" aria-label="Maintenance activities">
       <section class="panels" aria-live="polite">
 
-        <!-- PANEL 1: CONSTRUCTION (placeholder shell + demo crane SVG) -->
-        <article id="constructionPanel" class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0">
+        <!-- PANEL 1: CONSTRUCTION (media-based) -->
+        <article id="constructionPanel" class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0" data-panel="construction">
           <h2 id="construction-title" class="panel-title">Construction Department</h2>
 
-          <div class="scene scene--construction" id="constructionScene" role="img" aria-label="Construction site">
-            <!-- Demo: professional inline SVG crane skeleton (Phase 1 sample) -->
-            <svg id="craneSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="crane-svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="gSteel" x1="0" x2="1"><stop offset="0" stop-color="#2b3946"/><stop offset="1" stop-color="#0b1220"/></linearGradient>
-                <linearGradient id="gYellow" x1="0" x2="1"><stop offset="0" stop-color="#F59E0B"/><stop offset="1" stop-color="#b45309"/></linearGradient>
-                <radialGradient id="gMetalShine" cx="30%" cy="20%"><stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
-              </defs>
+          <!-- MEDIA CONTAINER
+               - data-asset-type: "video" | "gif" | "lottie"
+               - data-asset-src: path to file (relative to project)
+               - data-badge: small status text
+               - data-sync: "progress" to enable syncing with progress bar
+               Replace the src values with your production assets in /assets/
+          -->
+          <div class="media-wrap" role="img" aria-label="Construction animation">
+            <div class="media-container"
+                 data-asset-type="video"
+                 data-asset-src="assets/construction.webm"
+                 data-badge="WORKING"
+                 data-sync="progress">
+              <!-- Fallback content inserted by JS if needed -->
+              <!-- If you prefer Lottie, set data-asset-type="lottie" and data-asset-src="assets/construction.json" -->
+            </div>
 
-              <!-- tower -->
-              <g id="tower" transform="translate(120,60)">
-                <rect x="0" y="0" width="28" height="360" rx="6" fill="url(#gSteel)"></rect>
-                <g id="braces" fill="none" stroke="#0f1724" stroke-width="4" opacity="0.12">
-                  <path d="M0,0 L28,40 M0,40 L28,80 M0,80 L28,120 M0,120 L28,160 M0,160 L28,200 M0,200 L28,240 M0,240 L28,280 M0,280 L28,320"></path>
-                </g>
-                <g id="towerBolts" fill="#071226" opacity="0.9">
-                  <circle cx="6" cy="20" r="2"/><circle cx="22" cy="20" r="2"/>
-                  <circle cx="6" cy="60" r="2"/><circle cx="22" cy="60" r="2"/>
-                </g>
-              </g>
-
-              <!-- arm group (rotates) -->
-              <g id="armGroup" transform="translate(148,80)">
-                <g id="arm" transform="rotate(-6)">
-                  <rect x="0" y="0" width="520" height="18" rx="8" fill="url(#gSteel)"></rect>
-                  <rect x="12" y="4" width="496" height="6" rx="3" fill="rgba(255,255,255,0.02)"></rect>
-
-                  <!-- trolley -->
-                  <g id="trolley" transform="translate(260,-6)">
-                    <rect x="-18" y="-6" width="36" height="28" rx="4" fill="#0b1220" stroke="#CBD5E1" stroke-width="1.2"></rect>
-                    <rect x="-12" y="6" width="24" height="6" rx="2" fill="#b45309"></rect>
-                    <g id="trolleyWheels" fill="#071226">
-                      <circle cx="-8" cy="10" r="3"/><circle cx="8" cy="10" r="3"/>
-                    </g>
-                  </g>
-
-                  <!-- counterweight -->
-                  <rect id="counter" x="-36" y="-12" width="64" height="36" rx="6" fill="url(#gYellow)"></rect>
-
-                  <!-- hook group -->
-                  <g id="hookGroup" transform="translate(480,6)">
-                    <rect id="cable" x="0" y="0" width="3" height="120" fill="#94a3b8"></rect>
-                    <g id="hookBody" transform="translate(-10,120)">
-                      <rect x="0" y="0" width="22" height="22" rx="4" fill="#071226" stroke="#CBD5E1" stroke-width="3"></rect>
-                      <rect x="4" y="4" width="14" height="6" rx="2" fill="#0b1220"></rect>
-                      <g id="hookDetail" fill="#94a3b8" opacity="0.6">
-                        <circle cx="6" cy="12" r="1.2"/><circle cx="16" cy="12" r="1.2"/>
-                      </g>
-                    </g>
-                  </g>
-                </g>
-              </g>
-
-              <!-- building placeholder -->
-              <g id="building" transform="translate(520,120)">
-                <g id="scaffold" opacity="0.06">
-                  <rect x="-20" y="0" width="300" height="320" fill="url(#gSteel)"></rect>
-                </g>
-                <g id="floorsGroup"></g>
-                <g id="safetyNet" transform="translate(10,220)" opacity="0.9">
-                  <rect x="0" y="0" width="240" height="36" rx="6" fill="url(#gYellow)" opacity="0.06"></rect>
-                </g>
-              </g>
-
-              <!-- ground shadow -->
-              <ellipse cx="450" cy="480" rx="420" ry="28" fill="rgba(0,0,0,0.25)"></ellipse>
-            </svg>
-
-            <!-- HTML props layer (Phase 2 will replace with full SVG machines) -->
-            <div class="props-layer" id="constructionProps" aria-hidden="true"></div>
+            <div class="media-caption" aria-hidden="true">
+              <span class="media-label">Live Build Feed</span>
+            </div>
           </div>
         </article>
 
-        <!-- PANEL 2: ELECTRICAL (shell) -->
-        <article id="electricalPanel" class="panel panel--glass panel--electrical" aria-labelledby="electrical-title" tabindex="0">
+        <!-- PANEL 2: ELECTRICAL (media-based) -->
+        <article id="electricalPanel" class="panel panel--glass panel--electrical" aria-labelledby="electrical-title" tabindex="0" data-panel="electrical">
           <h2 id="electrical-title" class="panel-title">High Voltage Maintenance</h2>
-          <div class="scene scene--electrical" id="electricalScene" role="img" aria-label="Electrical maintenance room">
-            <!-- Placeholder inline SVG skeleton for Phase 2 -->
-            <svg id="electricalSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="electrical-svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="cabinetGrad" x1="0" x2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#111827"/></linearGradient>
-              </defs>
-              <g id="transformer" transform="translate(60,80)">
-                <rect x="0" y="0" width="220" height="320" rx="10" fill="url(#cabinetGrad)"></rect>
-                <g id="coils" transform="translate(24,36)"></g>
-              </g>
-              <g id="switchgear" transform="translate(320,80)">
-                <rect x="0" y="0" width="240" height="320" rx="10" fill="url(#cabinetGrad)"></rect>
-                <g id="breakers" transform="translate(16,16)"></g>
-              </g>
-            </svg>
-            <div class="electrical-overlay" id="electricalProps" aria-hidden="true"></div>
+
+          <div class="media-wrap" role="img" aria-label="Electrical animation">
+            <div class="media-container"
+                 data-asset-type="lottie"
+                 data-asset-src="assets/electrical.json"
+                 data-badge="ACTIVE"
+                 data-sync="progress">
+              <!-- Lottie JSON file path (place lottie.min.js locally to enable) -->
+            </div>
+
+            <div class="media-caption" aria-hidden="true">
+              <span class="media-label">Power Systems</span>
+            </div>
           </div>
         </article>
 
-        <!-- PANEL 3: INFRASTRUCTURE (shell) -->
-        <article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0">
+        <!-- PANEL 3: INFRASTRUCTURE (media-based) -->
+        <article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0" data-panel="infrastructure">
           <h2 id="infra-title" class="panel-title">Server & Pipeline Infrastructure</h2>
-          <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room and pipelines">
-            <!-- Placeholder inline SVG skeleton for Phase 4 -->
-            <svg id="infraSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="infra-svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="rackGrad" x1="0" x2="1"><stop offset="0" stop-color="#071226"/><stop offset="1" stop-color="#0f1724"/></linearGradient>
-              </defs>
-              <g id="racks" transform="translate(40,40)"></g>
-              <g id="pipes" transform="translate(420,220)"></g>
-            </svg>
-            <div class="infra-overlay" id="infraProps" aria-hidden="true"></div>
+
+          <div class="media-wrap" role="img" aria-label="Infrastructure animation">
+            <div class="media-container"
+                 data-asset-type="video"
+                 data-asset-src="assets/infra_loop.webm"
+                 data-badge="UPGRADING"
+                 data-sync="progress">
+              <!-- Use a high-quality WebM/MP4 loop here -->
+            </div>
+
+            <div class="media-caption" aria-hidden="true">
+              <span class="media-label">Data Center Feed</span>
+            </div>
           </div>
         </article>
 
       </section>
 
-      <!-- RIGHT COLUMN: PROGRESS + LIVE INFO -->
+      <!-- RIGHT COLUMN: PROGRESS + LIVE INFO (unchanged) -->
       <aside class="side" aria-label="Progress and live information">
         <div class="card card--progress" role="status" aria-live="polite" tabindex="0">
           <div class="card-head">
@@ -228,7 +174,11 @@
     </main>
   </div>
 
-  <!-- Phase 1 script -->
+  <!-- Phase 1 script (updated) -->
   <script src="js/script.js" defer></script>
+  <!-- Optional: include lottie.min.js locally if you plan to use Lottie JSON assets.
+       Example (place lottie.min.js in js/ and uncomment):
+       <script src="js/lottie.min.js" defer></script>
+  -->
 </body>
 </html>
