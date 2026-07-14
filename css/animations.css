@@ -1,85 +1,25 @@
-/* css/animations.css
-   Phase 1: Keyframes and animation helpers
-   - GPU-friendly transforms (translate, rotate, scale, opacity)
-   - Reduced-motion support
-*/
-
-/* -------------------------
-   Background animations
-   ------------------------- */
-@keyframes gradientShift{
-  0%{filter:blur(18px) hue-rotate(0deg)}
-  50%{filter:blur(22px) hue-rotate(6deg)}
-  100%{filter:blur(18px) hue-rotate(0deg)}
-}
-@keyframes gridDrift{
-  0%{transform:translateY(0) translateX(0)}
-  50%{transform:translateY(-8px) translateX(6px)}
-  100%{transform:translateY(0) translateX(0)}
-}
-@keyframes lightDrift{
-  0%{transform:translateY(0) translateX(0) scale(1)}
-  50%{transform:translateY(-12px) translateX(6px) scale(1.02)}
-  100%{transform:translateY(0) translateX(0) scale(1)}
-}
-@keyframes fogMove{
-  0%{transform:translateX(0)}
-  50%{transform:translateX(6%)}
-  100%{transform:translateX(0)}
-}
-@keyframes twinkle{
-  0%{opacity:0.2; transform:scale(0.8)}
-  50%{opacity:1; transform:scale(1.2)}
-  100%{opacity:0.2; transform:scale(0.8)}
-}
-@keyframes gearSpin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
+/* Floating and glow helpers for media containers */
+@keyframes floatY {
+  0% { transform: translateY(0px) rotateX(0.01deg); }
+  50% { transform: translateY(-8px) rotateX(0.01deg); }
+  100% { transform: translateY(0px) rotateX(0.01deg); }
 }
 
-/* -------------------------
-   Construction demo animations
-   ------------------------- */
-@keyframes craneRotate {
-  0%{transform:rotate(-8deg)}
-  25%{transform:rotate(10deg)}
-  50%{transform:rotate(-2deg)}
-  75%{transform:rotate(12deg)}
-  100%{transform:rotate(-8deg)}
+/* subtle shimmer for media on hover (light sweep) */
+.media-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 100%);
+  transform: translateX(-120%);
+  pointer-events: none;
+  z-index: 3;
+  transition: transform 1.2s cubic-bezier(.2,.9,.3,1);
 }
-@keyframes trolleyMove {
-  0%{transform:translateX(-120px)}
-  50%{transform:translateX(120px)}
-  100%{transform:translateX(-120px)}
-}
-@keyframes hookLift {
-  0%{transform:translateY(0) rotate(0deg)}
-  30%{transform:translateY(36px) rotate(2deg)}
-  60%{transform:translateY(-6px) rotate(-2deg)}
-  100%{transform:translateY(0) rotate(0deg)}
-}
+.panel:hover .media-container::after { transform: translateX(0%); }
 
-/* -------------------------
-   Progress & micro-interactions
-   ------------------------- */
-@keyframes glowSweep {
-  0%{transform:translateX(-10%)}
-  50%{transform:translateX(60%)}
-  100%{transform:translateX(-10%)}
-}
-
-/* -------------------------
-   Misc micro animations
-   ------------------------- */
-@keyframes workerPulse {
-  0%{transform:scale(1)}
-  50%{transform:scale(1.02)}
-  100%{transform:scale(1)}
-}
-
-/* -------------------------
-   Reduced motion support
-   ------------------------- */
-@media (prefers-reduced-motion: reduce){
-  *{animation-duration:0.001s !important; animation-iteration-count:1 !important; transition-duration:0.001s !important}
+/* reduced motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  .media-container { animation: none !important; }
+  .media-container::after { transition: none !important; transform: none !important; }
 }
