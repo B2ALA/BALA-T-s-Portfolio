@@ -3,54 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
+  <meta name="description" content="Premium cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
   <title>Website Under Maintenance — Upgrading Now</title>
 
+  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
 
+  <!-- Accessibility / SEO -->
   <meta name="robots" content="noindex,follow" />
 </head>
 <body>
   <div id="app" class="app" aria-live="polite">
 
-    <!-- BACKGROUND (unchanged) -->
+    <!-- Background layers (parallax, fog, blueprint grid, lights, particles) -->
     <div class="bg" aria-hidden="true">
       <div class="bg-gradient"></div>
       <div class="blueprint-grid"></div>
-      <div class="volumetric">
-        <div class="beam beam--1"></div>
-        <div class="beam beam--2"></div>
-        <div class="beam beam--3"></div>
+      <div class="bg-lights">
+        <div class="beam b1"></div>
+        <div class="beam b2"></div>
+        <div class="beam b3"></div>
       </div>
       <div class="bg-objects">
-        <div class="gear g--1"></div>
-        <div class="gear g--2"></div>
-        <div class="star s--1"></div>
-        <div class="star s--2"></div>
+        <div class="gear g1"></div>
+        <div class="gear g2"></div>
+        <div class="star s1"></div>
+        <div class="star s2"></div>
       </div>
-      <canvas id="bgParticles" class="bg-particles"></canvas>
-      <div class="fog-layer"></div>
+      <canvas id="bgCanvas" class="bg-canvas"></canvas>
       <div class="lensflare"></div>
+      <div class="fog-layer"></div>
     </div>
 
-    <!-- HEADER / HERO (unchanged) -->
+    <!-- Header / Hero -->
     <header class="header" role="banner" aria-label="Maintenance header">
       <div class="header-inner">
         <button class="brand" aria-label="Your Company Home" title="Your Company" tabindex="0">
-          <!-- Inline SVG logo -->
+          <!-- Premium SVG logo -->
           <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
             <defs>
-              <linearGradient id="logoGrad" x1="0" x2="1">
+              <linearGradient id="lgA" x1="0" x2="1">
                 <stop offset="0" stop-color="#3B82F6"/>
                 <stop offset="1" stop-color="#F59E0B"/>
               </linearGradient>
-              <filter id="logoGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="6" result="b"/>
                 <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
               </filter>
             </defs>
-            <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#logoGrad)" filter="url(#logoGlow)"></rect>
+            <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#lgA)" filter="url(#fGlow)"></rect>
             <path d="M20 38 L32 22 L44 38 Z" fill="#071226" opacity="0.98"></path>
           </svg>
         </button>
@@ -63,78 +65,31 @@
       </div>
     </header>
 
-    <!-- MAIN: 3 SCENES + PROGRESS -->
+    <!-- Main content: three cinematic panels + progress card -->
     <main class="main" role="main" aria-label="Maintenance activities">
       <section class="panels" aria-live="polite">
 
-        <!-- PANEL 1: CONSTRUCTION (media-based) -->
-        <article id="constructionPanel" class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0" data-panel="construction">
+        <!-- Panel 1: Construction (container only; elements created by JS) -->
+        <article id="constructionPanel" class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0">
           <h2 id="construction-title" class="panel-title">Construction Department</h2>
-
-          <!-- MEDIA CONTAINER
-               - data-asset-type: "video" | "gif" | "lottie"
-               - data-asset-src: path to file (relative to project)
-               - data-badge: small status text
-               - data-sync: "progress" to enable syncing with progress bar
-               Replace the src values with your production assets in /assets/
-          -->
-          <div class="media-wrap" role="img" aria-label="Construction animation">
-            <div class="media-container"
-                 data-asset-type="video"
-                 data-asset-src="assets/construction.webm"
-                 data-badge="WORKING"
-                 data-sync="progress">
-              <!-- Fallback content inserted by JS if needed -->
-              <!-- If you prefer Lottie, set data-asset-type="lottie" and data-asset-src="assets/construction.json" -->
-            </div>
-
-            <div class="media-caption" aria-hidden="true">
-              <span class="media-label">Live Build Feed</span>
-            </div>
-          </div>
+          <div class="scene scene--construction" id="constructionScene" role="img" aria-label="Construction site with crane, vehicles, workers and building"></div>
         </article>
 
-        <!-- PANEL 2: ELECTRICAL (media-based) -->
-        <article id="electricalPanel" class="panel panel--glass panel--electrical" aria-labelledby="electrical-title" tabindex="0" data-panel="electrical">
+        <!-- Panel 2: Electrical -->
+        <article id="electricalPanel" class="panel panel--glass panel--electrical" aria-labelledby="electrical-title" tabindex="0">
           <h2 id="electrical-title" class="panel-title">High Voltage Maintenance</h2>
-
-          <div class="media-wrap" role="img" aria-label="Electrical animation">
-            <div class="media-container"
-                 data-asset-type="lottie"
-                 data-asset-src="assets/electrical.json"
-                 data-badge="ACTIVE"
-                 data-sync="progress">
-              <!-- Lottie JSON file path (place lottie.min.js locally to enable) -->
-            </div>
-
-            <div class="media-caption" aria-hidden="true">
-              <span class="media-label">Power Systems</span>
-            </div>
-          </div>
+          <div class="scene scene--electrical" id="electricalScene" role="img" aria-label="Electrical maintenance room with transformers, panels, and electricians"></div>
         </article>
 
-        <!-- PANEL 3: INFRASTRUCTURE (media-based) -->
-        <article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0" data-panel="infrastructure">
+        <!-- Panel 3: Infrastructure / Server -->
+        <article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0">
           <h2 id="infra-title" class="panel-title">Server & Pipeline Infrastructure</h2>
-
-          <div class="media-wrap" role="img" aria-label="Infrastructure animation">
-            <div class="media-container"
-                 data-asset-type="video"
-                 data-asset-src="assets/infra_loop.webm"
-                 data-badge="UPGRADING"
-                 data-sync="progress">
-              <!-- Use a high-quality WebM/MP4 loop here -->
-            </div>
-
-            <div class="media-caption" aria-hidden="true">
-              <span class="media-label">Data Center Feed</span>
-            </div>
-          </div>
+          <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room with racks, pipelines, and network activity"></div>
         </article>
 
       </section>
 
-      <!-- RIGHT COLUMN: PROGRESS + LIVE INFO (unchanged) -->
+      <!-- Right column: progress + live info -->
       <aside class="side" aria-label="Progress and live information">
         <div class="card card--progress" role="status" aria-live="polite" tabindex="0">
           <div class="card-head">
@@ -174,11 +129,7 @@
     </main>
   </div>
 
-  <!-- Phase 1 script (updated) -->
+  <!-- Scripts -->
   <script src="js/script.js" defer></script>
-  <!-- Optional: include lottie.min.js locally if you plan to use Lottie JSON assets.
-       Example (place lottie.min.js in js/ and uncomment):
-       <script src="js/lottie.min.js" defer></script>
-  -->
 </body>
 </html>
