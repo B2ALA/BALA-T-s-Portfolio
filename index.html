@@ -1,135 +1,38 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Premium cinematic Website Under Maintenance — live animated construction, electrical and infrastructure scenes." />
-  <title>Website Under Maintenance — Upgrading Now</title>
+<!-- index.html (only the Infrastructure panel section shown; keep the rest of your page intact) -->
+<article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0" data-panel="infrastructure">
+  <h2 id="infra-title" class="panel-title">Server & Pipeline Infrastructure</h2>
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/animations.css" />
+  <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room and pipelines">
+    <!-- Server racks (SVG) -->
+    <svg id="infraRacksSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="infra-svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="rackGrad" x1="0" x2="1">
+          <stop offset="0" stop-color="#071226"/>
+          <stop offset="1" stop-color="#0f1724"/>
+        </linearGradient>
+        <filter id="ledGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
 
-  <!-- Accessibility / SEO -->
-  <meta name="robots" content="noindex,follow" />
-</head>
-<body>
-  <div id="app" class="app" aria-live="polite">
+      <!-- three racks -->
+      <g id="racks" transform="translate(40,40)"></g>
 
-    <!-- Background layers (parallax, fog, blueprint grid, lights, particles) -->
-    <div class="bg" aria-hidden="true">
-      <div class="bg-gradient"></div>
-      <div class="blueprint-grid"></div>
-      <div class="bg-lights">
-        <div class="beam b1"></div>
-        <div class="beam b2"></div>
-        <div class="beam b3"></div>
-      </div>
-      <div class="bg-objects">
-        <div class="gear g1"></div>
-        <div class="gear g2"></div>
-        <div class="star s1"></div>
-        <div class="star s2"></div>
-      </div>
-      <canvas id="bgCanvas" class="bg-canvas"></canvas>
-      <div class="lensflare"></div>
-      <div class="fog-layer"></div>
-    </div>
+      <!-- circuit lines layer -->
+      <g id="circuitLines" transform="translate(0,0)"></g>
 
-    <!-- Header / Hero -->
-    <header class="header" role="banner" aria-label="Maintenance header">
-      <div class="header-inner">
-        <button class="brand" aria-label="Your Company Home" title="Your Company" tabindex="0">
-          <!-- Premium SVG logo -->
-          <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-            <defs>
-              <linearGradient id="lgA" x1="0" x2="1">
-                <stop offset="0" stop-color="#3B82F6"/>
-                <stop offset="1" stop-color="#F59E0B"/>
-              </linearGradient>
-              <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="6" result="b"/>
-                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-            <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#lgA)" filter="url(#fGlow)"></rect>
-            <path d="M20 38 L32 22 L44 38 Z" fill="#071226" opacity="0.98"></path>
-          </svg>
-        </button>
+      <!-- packet layer (SVG group for crisp glow) -->
+      <g id="packets" transform="translate(0,0)"></g>
+    </svg>
 
-        <div class="hero-text" role="heading" aria-level="1">
-          <h1 class="title">🚧 WEBSITE UNDER MAINTENANCE</h1>
-          <p class="subtitle">We're building something amazing for you.</p>
-          <p class="subdesc">Our engineers are working around the clock to improve your experience. Thank you for your patience.</p>
-        </div>
-      </div>
-    </header>
+    <!-- Binary streams container (DOM-based for text rendering & neon glow) -->
+    <div id="binaryStreams" class="binary-streams" aria-hidden="true"></div>
 
-    <!-- Main content: three cinematic panels + progress card -->
-    <main class="main" role="main" aria-label="Maintenance activities">
-      <section class="panels" aria-live="polite">
+    <!-- Floating labels -->
+    <div id="infraLabels" class="infra-labels" aria-hidden="true"></div>
 
-        <!-- Panel 1: Construction (container only; elements created by JS) -->
-        <article id="constructionPanel" class="panel panel--glass panel--construction" aria-labelledby="construction-title" tabindex="0">
-          <h2 id="construction-title" class="panel-title">Construction Department</h2>
-          <div class="scene scene--construction" id="constructionScene" role="img" aria-label="Construction site with crane, vehicles, workers and building"></div>
-        </article>
-
-        <!-- Panel 2: Electrical -->
-        <article id="electricalPanel" class="panel panel--glass panel--electrical" aria-labelledby="electrical-title" tabindex="0">
-          <h2 id="electrical-title" class="panel-title">High Voltage Maintenance</h2>
-          <div class="scene scene--electrical" id="electricalScene" role="img" aria-label="Electrical maintenance room with transformers, panels, and electricians"></div>
-        </article>
-
-        <!-- Panel 3: Infrastructure / Server -->
-        <article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0">
-          <h2 id="infra-title" class="panel-title">Server & Pipeline Infrastructure</h2>
-          <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room with racks, pipelines, and network activity"></div>
-        </article>
-
-      </section>
-
-      <!-- Right column: progress + live info -->
-      <aside class="side" aria-label="Progress and live information">
-        <div class="card card--progress" role="status" aria-live="polite" tabindex="0">
-          <div class="card-head">
-            <h3 class="card-title">Overall Upgrade Progress</h3>
-            <div class="progress-percent" id="progressPercent">61%</div>
-          </div>
-
-          <div class="progress-track" aria-hidden="true">
-            <div class="progress-glow" id="progressGlow"></div>
-            <div class="progress-fill" id="progressFill" style="width:61%"></div>
-          </div>
-
-          <div class="status-rotator" id="statusRotator" aria-live="polite">Installing New Features...</div>
-
-          <div class="live-grid" aria-hidden="false">
-            <div class="live-row"><span class="label">Current Date</span><span id="liveDate" class="value">—</span></div>
-            <div class="live-row"><span class="label">Current Time</span><span id="liveTime" class="value">—</span></div>
-            <div class="live-row"><span class="label">Day</span><span id="liveDay" class="value">—</span></div>
-            <div class="live-row"><span class="label">Estimated Completion</span><span id="liveEst" class="value">—</span></div>
-            <div class="live-row"><span class="label">Website Status</span><span id="liveSite" class="value">Online after maintenance</span></div>
-            <div class="live-row"><span class="label">Server Status</span><span id="liveServer" class="value">Degraded → Upgrading</span></div>
-            <div class="live-row"><span class="label">Network Status</span><span id="liveNet" class="value">Active</span></div>
-            <div class="live-row"><span class="label">Maintenance Phase</span><span id="livePhase" class="value">Deploying</span></div>
-            <div class="live-row"><span class="label">Last Update</span><span id="liveUpdate" class="value">—</span></div>
-          </div>
-        </div>
-
-        <div class="card card--contact" role="contentinfo" aria-label="Support contact">
-          <div class="contact">
-            <div class="contact-title">Need immediate assistance?</div>
-            <a class="contact-mail" href="mailto:support@yourcompany.com">support@yourcompany.com</a>
-            <div class="contact-phone">+91 XXXXX XXXXX</div>
-          </div>
-          <div class="footer-note">© 2026 Your Company Name — We'll be back soon.</div>
-        </div>
-      </aside>
-    </main>
+    <!-- Overlay for subtle vignette and glow -->
+    <div class="infra-overlay" aria-hidden="true"></div>
   </div>
-
-  <!-- Scripts -->
-  <script src="js/script.js" defer></script>
-</body>
-</html>
+</article>
