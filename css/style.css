@@ -1,13 +1,11 @@
 /* css/style.css
-   Ultra-premium production CSS
+   Premium production CSS
    - Design tokens
    - Layout and responsive rules
    - Base visuals for SVG overlays and HTML props
 */
 
-/* -------------------------
-   Design tokens
-   ------------------------- */
+/* Design tokens */
 :root{
   --bg: #0B1220;
   --card: #182235;
@@ -28,9 +26,7 @@
   --ease: cubic-bezier(.2,.9,.3,1);
 }
 
-/* -------------------------
-   Reset & base
-   ------------------------- */
+/* Reset & base */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -46,9 +42,7 @@ body{
 /* App container */
 .app{min-height:100vh; display:flex; flex-direction:column; align-items:center; position:relative;}
 
-/* -------------------------
-   Background layers
-   ------------------------- */
+/* Background */
 .bg{position:fixed; inset:0; z-index:0; pointer-events:none}
 .bg-gradient{
   position:absolute; inset:0;
@@ -87,9 +81,7 @@ body{
 .fog-layer{position:absolute; left:-10%; bottom:6%; width:1400px;height:220px; background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent); filter:blur(30px); animation:fogMove 22s linear infinite; opacity:0.45}
 .lensflare{position:absolute; left:50%; top:6%; width:600px;height:600px; transform:translateX(-50%); background:radial-gradient(closest-side, rgba(255,255,255,0.02), transparent 40%); filter:blur(40px); mix-blend-mode:screen; opacity:0.5}
 
-/* -------------------------
-   Header / Hero
-   ------------------------- */
+/* Header */
 .header{position:relative; z-index:10; width:100%; display:flex; justify-content:center; padding:28px 20px 6px}
 .header-inner{max-width:var(--max-width); width:100%; display:flex; flex-direction:column; align-items:center; gap:12px}
 .brand{background:transparent; border:0; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:6px; border-radius:10px; box-shadow:var(--shadow-1); transition:transform 220ms var(--ease)}
@@ -98,9 +90,7 @@ body{
 .subtitle{margin:6px 0 0; color:var(--muted); font-weight:600; text-align:center}
 .subdesc{margin:6px 0 0; color:var(--muted); text-align:center; max-width:880px}
 
-/* -------------------------
-   Main layout
-   ------------------------- */
+/* Main layout */
 .main{position:relative; z-index:10; width:100%; max-width:var(--max-width); margin:18px auto; padding:18px; display:grid; grid-template-columns: 1fr 360px; gap:20px; align-items:start}
 .panels{display:grid; grid-template-columns: repeat(3, 1fr); gap:18px}
 
@@ -123,33 +113,25 @@ body{
 .panel-title{margin:0 0 10px 0; color:var(--muted); font-weight:700; font-size:0.95rem}
 .scene{position:relative; height:420px; display:block; perspective:1400px}
 
-/* -------------------------
-   Construction scene base visuals
-   ------------------------- */
+/* Construction scene */
 .scene--construction{background:linear-gradient(180deg, rgba(245,158,11,0.01), transparent); border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25)}
 .crane-svg{width:100%; height:100%; display:block}
 .props-layer{position:absolute; inset:0; pointer-events:none; z-index:60}
 
-/* props base */
-.prop { position:absolute; transform-origin:center; will-change:transform,opacity; }
-
-/* -------------------------
-   Electrical scene base visuals
-   ------------------------- */
+/* Electrical scene */
 .scene--electrical{background:linear-gradient(180deg, rgba(59,130,246,0.02), transparent); border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25)}
 .electrical-svg{width:100%; height:100%; display:block}
 .electrical-overlay{position:absolute; inset:0; pointer-events:none; z-index:60}
 
-/* -------------------------
-   Infrastructure scene base visuals
-   ------------------------- */
+/* Infra scene */
 .scene--infra{background:linear-gradient(180deg, rgba(16,185,129,0.01), transparent); border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25)}
 .infra-svg{width:100%; height:100%; display:block}
 .infra-overlay{position:absolute; inset:0; pointer-events:none; z-index:60}
 
-/* -------------------------
-   Right column cards
-   ------------------------- */
+/* Props base */
+.prop { position:absolute; transform-origin:center; will-change:transform,opacity; }
+
+/* Right column */
 .side{display:flex; flex-direction:column; gap:18px; align-items:stretch}
 .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; border:1px solid var(--glass-border); box-shadow:var(--shadow-1); backdrop-filter: blur(8px) saturate(120%)}
 .card--progress{position:sticky; top:28px}
@@ -168,9 +150,7 @@ body{
 .contact-mail{color:var(--accent-2); text-decoration:none; font-weight:700}
 .footer-note{margin-top:12px; color:var(--muted); font-size:0.85rem}
 
-/* -------------------------
-   Responsive
-   ------------------------- */
+/* Responsive */
 @media (max-width:1100px){
   .main{grid-template-columns: 1fr; padding:12px}
   .panels{grid-template-columns: 1fr; grid-auto-rows:auto}
@@ -178,7 +158,5 @@ body{
   .card--progress{position:relative; top:auto}
 }
 
-/* -------------------------
-   Accessibility focus
-   ------------------------- */
+/* Accessibility focus */
 button:focus, .panel:focus, .card:focus{outline:3px solid rgba(59,130,246,0.12); outline-offset:6px}
