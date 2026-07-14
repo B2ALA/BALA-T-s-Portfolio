@@ -1,8 +1,8 @@
 /* css/style.css
-   Production-ready styling for the cinematic maintenance page.
+   Ultra-premium maintenance page base styles.
    - Organized variables
-   - Semantic sections
    - Glassmorphism, depth, and responsive layout
+   - Comments explain structure and intent
 */
 
 /* =========================
@@ -20,7 +20,7 @@
   --muted: #CBD5E1;
 
   /* Layout */
-  --max-width: 1200px;
+  --max-width: 1280px;
   --radius: 14px;
   --glass-alpha: 0.06;
   --glass-border: rgba(255,255,255,0.06);
@@ -29,8 +29,6 @@
 
   /* Motion */
   --ease: cubic-bezier(.2,.9,.3,1);
-  --slow: 1.6s;
-  --fast: 0.6s;
 
   /* Typography */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -55,18 +53,18 @@ body{
 /* App container */
 .app{min-height:100vh; display:flex; flex-direction:column; align-items:center; position:relative;}
 
-/* Background layers occupy full viewport */
-.bg-layer{position:fixed; inset:0; z-index:0; pointer-events:none}
-
-/* Gradient & subtle animated color shifts */
+/* =========================
+   Background layers
+   ========================= */
+.bg{position:fixed; inset:0; z-index:0; pointer-events:none}
 .bg-gradient{
   position:absolute; inset:0;
   background:
-    radial-gradient(800px 400px at 10% 10%, rgba(59,130,246,0.06), transparent 8%),
-    radial-gradient(700px 350px at 90% 80%, rgba(245,158,11,0.04), transparent 8%),
+    radial-gradient(900px 420px at 10% 12%, rgba(59,130,246,0.06), transparent 8%),
+    radial-gradient(700px 320px at 88% 78%, rgba(245,158,11,0.04), transparent 8%),
     linear-gradient(180deg, rgba(11,18,32,1) 0%, rgba(6,10,18,1) 100%);
   filter:blur(18px) saturate(110%);
-  animation:gradientShift 18s linear infinite;
+  animation:gradientShift 20s linear infinite;
   opacity:0.95;
 }
 
@@ -83,30 +81,26 @@ body{
   animation:gridDrift 28s linear infinite;
 }
 
-/* Volumetric lights (soft beams) */
-.volumetric-lights .light{
-  position:absolute; width:420px; height:420px; border-radius:50%;
-  background:radial-gradient(closest-side, rgba(255,255,255,0.03), transparent 40%);
-  filter:blur(40px); mix-blend-mode:screen; opacity:0.6;
-}
-.volumetric-lights .l1{left:6%; top:6%; animation:lightDrift 24s linear infinite}
-.volumetric-lights .l2{right:8%; top:12%; width:520px;height:520px; animation:lightDrift 32s linear infinite}
-.volumetric-lights .l3{left:40%; top:2%; width:360px;height:360px; animation:lightDrift 20s linear infinite}
+/* Volumetric beams */
+.bg-lights .beam{position:absolute; width:420px; height:420px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,255,255,0.03), transparent 40%); filter:blur(40px); mix-blend-mode:screen; opacity:0.6}
+.bg-lights .b1{left:6%; top:6%; animation:lightDrift 24s linear infinite}
+.bg-lights .b2{right:8%; top:12%; width:520px;height:520px; animation:lightDrift 32s linear infinite}
+.bg-lights .b3{left:40%; top:2%; width:360px;height:360px; animation:lightDrift 20s linear infinite}
 
 /* Floating decorative objects */
-.floating-objects .gear{position:absolute; border-radius:50%; border:6px solid rgba(255,255,255,0.03); box-shadow:inset 0 0 18px rgba(255,255,255,0.02)}
-.floating-objects .g1{left:6%; top:60%; width:84px;height:84px; animation:gearSpin 12s linear infinite}
-.floating-objects .g2{right:8%; top:40%; width:56px;height:56px; animation:gearSpin 9s linear reverse infinite}
-.floating-objects .geo{position:absolute; width:36px;height:36px; border-radius:8px; background:linear-gradient(90deg, rgba(59,130,246,0.06), rgba(245,158,11,0.04)); filter:blur(6px)}
-.floating-objects .geo1{left:20%; top:20%; animation:floaty 10s ease-in-out infinite}
-.floating-objects .geo2{right:20%; top:70%; animation:floaty 14s ease-in-out infinite}
+.bg-objects .gear{position:absolute; border-radius:50%; border:6px solid rgba(255,255,255,0.03); box-shadow:inset 0 0 18px rgba(255,255,255,0.02)}
+.bg-objects .g1{left:6%; top:60%; width:84px;height:84px; animation:gearSpin 12s linear infinite}
+.bg-objects .g2{right:8%; top:40%; width:56px;height:56px; animation:gearSpin 9s linear reverse infinite}
+.bg-objects .star{position:absolute; width:6px;height:6px; background:rgba(255,255,255,0.9); border-radius:50%; filter:blur(1px); opacity:0.9}
+.bg-objects .s1{left:20%; top:10%; animation:twinkle 6s linear infinite}
+.bg-objects .s2{right:20%; top:30%; animation:twinkle 8s linear infinite}
+
+/* Canvas for particles (JS-driven) */
+.bg-canvas{position:absolute; inset:0; z-index:1; opacity:0.95}
 
 /* Lens flare & fog */
 .lensflare{position:absolute; left:50%; top:6%; width:600px;height:600px; transform:translateX(-50%); background:radial-gradient(closest-side, rgba(255,255,255,0.02), transparent 40%); filter:blur(40px); mix-blend-mode:screen; opacity:0.5}
-.fog{position:absolute; left:-10%; bottom:6%; width:1400px;height:220px; background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent); filter:blur(30px); animation:fogMove 22s linear infinite; opacity:0.45}
-
-/* Particles canvas (handled by JS) */
-.bg-particles{position:absolute; inset:0; z-index:1; opacity:0.95}
+.fog-layer{position:absolute; left:-10%; bottom:6%; width:1400px;height:220px; background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent); filter:blur(30px); animation:fogMove 22s linear infinite; opacity:0.45}
 
 /* =========================
    Header / Hero
@@ -132,7 +126,7 @@ body{
   position:relative;
   border-radius:var(--radius);
   padding:14px;
-  min-height:420px;
+  min-height:520px;
   background:linear-gradient(180deg, rgba(255,255,255,var(--glass-alpha)), rgba(255,255,255,0.02));
   border:1px solid var(--glass-border);
   box-shadow:var(--shadow-1);
@@ -148,98 +142,114 @@ body{
 .panel-title{margin:0 0 10px 0; color:var(--muted); font-weight:700; font-size:0.95rem}
 
 /* Scenes common */
-.scene{position:relative; height:340px; display:block; perspective:1200px}
+.scene{position:relative; height:420px; display:block; perspective:1400px}
 
 /* =========================
-   Construction scene styles
+   Construction scene base visuals
    ========================= */
-.scene--construction{background:linear-gradient(180deg, rgba(245,158,11,0.01), transparent); border-radius:10px; padding:8px}
-.crane{position:absolute; left:6%; bottom:12px; width:260px; height:260px; transform-origin:left bottom; z-index:6}
-.crane-base{position:absolute; left:36px; bottom:0; width:48px; height:22px; background:linear-gradient(180deg,#0f1724,#071226); border-radius:6px}
-.crane-tower{position:absolute; left:64px; bottom:22px; width:18px; height:200px; background:linear-gradient(180deg,#1f2937,#0b1220); box-shadow:inset 0 0 8px rgba(255,255,255,0.02)}
-.crane-arm{position:absolute; left:78px; bottom:200px; width:320px; height:14px; background:linear-gradient(90deg,#0b1220,#111827); transform-origin:20px 7px; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-.counterweight{position:absolute; left:-22px; top:-8px; width:44px; height:28px; background:linear-gradient(90deg,var(--accent),#b45309); border-radius:6px; box-shadow:0 10px 30px rgba(245,158,11,0.12)}
-.arm-rail{position:absolute; left:12px; right:12px; top:4px; height:6px; background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:6px}
-.hook{position:absolute; right:18px; top:12px; width:40px; height:90px; display:flex; align-items:flex-start; justify-content:center}
-.hook-line{width:3px; height:56px; background:linear-gradient(180deg,#94a3b8,#0b1220); margin-bottom:6px}
-.hook-body{width:20px; height:20px; border-radius:4px; background:#071226; border:3px solid var(--muted); box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-
-/* Building & floors */
-.building{position:absolute; right:6%; bottom:12px; width:180px; height:260px; display:flex; align-items:flex-end; justify-content:center}
-.scaffold{position:absolute; left:0; right:0; bottom:0; top:0; background-image: linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px); opacity:0.06}
-.floors{width:100%; display:flex; flex-direction:column; gap:8px; align-items:center}
-.floor{width:92%; height:36px; background:linear-gradient(180deg,#263445,#0f1724); border-radius:8px; position:relative; overflow:visible; box-shadow:inset 0 -6px 18px rgba(0,0,0,0.6); transform:translateY(18px); opacity:0}
-.floor::after{
-  content:"";
-  position:absolute; left:8px; right:8px; bottom:-12px; height:12px;
-  background-image: repeating-linear-gradient(90deg, #b45309 0 18px, #92400e 18px 36px);
-  border-radius:4px;
-  transform-origin:left center;
-  opacity:0.95;
+.scene--construction{
+  background:
+    linear-gradient(180deg, rgba(245,158,11,0.01), transparent),
+    radial-gradient(600px 200px at 20% 10%, rgba(59,130,246,0.02), transparent 10%);
+  border-radius:10px; padding:8px; overflow:hidden;
+  box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
 }
 
-/* Workers & props */
-.construction-props{position:absolute; left:6%; bottom:12px; display:flex; gap:12px; align-items:flex-end; z-index:7}
-.worker{width:44px;height:84px;background:linear-gradient(180deg,#f59e0b,#b45309); border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-.worker--walk{animation:workerWalk 6s linear infinite}
-.worker--carry{width:36px;height:72px;background:linear-gradient(180deg,#3b82f6,#1e40af); border-radius:8px; animation:workerCarry 5.6s linear infinite}
-.wheelbarrow{width:64px;height:36px;background:linear-gradient(180deg,#111827,#0b1220); border-radius:8px}
-.toolbox{width:44px;height:28px;background:linear-gradient(90deg,#3b82f6,#1e3a8a); border-radius:6px}
-.concrete-mixer{width:48px;height:48px;border-radius:8px;background:linear-gradient(90deg,#94a3b8,#475569); transform-origin:center; animation:mixerSpin 3.6s linear infinite}
-.cones{display:flex; gap:6px}
-.cone{width:10px;height:18px;background:linear-gradient(180deg,var(--accent),#b45309); border-radius:3px}
-.caution-tape{position:absolute; left:6%; top:36%; padding:6px 12px; background:linear-gradient(90deg,var(--accent),#b45309); color:#071226; font-weight:800; border-radius:8px; transform:skewX(-10deg); box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-.warning-light{position:absolute; left:12%; top:8%; width:18px;height:18px;background:var(--accent); border-radius:50%; box-shadow:0 0 18px rgba(245,158,11,0.6); animation:warnBlink 2s linear infinite}
-.dust-cloud{position:absolute; right:18%; bottom:40%; width:120px;height:120px;background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 40%); filter:blur(6px); animation:dustDrift 6s ease-in-out infinite}
+/* We'll create many elements via JS. Provide base classes for each type. */
+
+/* Crane (complex, many parts) */
+.crane {
+  position:absolute; left:6%; bottom:12px; width:420px; height:420px; transform-origin:left bottom; z-index:40;
+  pointer-events:none;
+}
+.crane .tower { position:absolute; left:120px; bottom:0; width:28px; height:320px; background:linear-gradient(180deg,#1f2937,#0b1220); border-radius:6px; box-shadow:inset 0 0 18px rgba(255,255,255,0.02); transform-origin:center bottom; }
+.crane .arm { position:absolute; left:148px; bottom:300px; width:520px; height:18px; background:linear-gradient(90deg,#0b1220,#111827); border-radius:8px; transform-origin:20px 9px; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+.crane .counter { position:absolute; left:-36px; top:-12px; width:64px; height:36px; background:linear-gradient(90deg,var(--accent),#b45309); border-radius:6px; box-shadow:0 12px 40px rgba(245,158,11,0.12); }
+.crane .hook { position:absolute; right:18px; top:12px; width:40px; height:120px; display:flex; align-items:flex-start; justify-content:center; z-index:60; }
+.crane .hook .line { width:3px; height:72px; background:linear-gradient(180deg,#94a3b8,#0b1220); margin-bottom:6px; transform-origin:top center; }
+.crane .hook .body { width:22px; height:22px; border-radius:4px; background:#071226; border:3px solid var(--muted); box-shadow:0 12px 40px rgba(0,0,0,0.6); }
+
+/* Building floors (we animate many floors) */
+.building { position:absolute; right:6%; bottom:12px; width:260px; height:360px; display:flex; align-items:flex-end; justify-content:center; z-index:30; }
+.building .floor { width:94%; height:44px; background:linear-gradient(180deg,#263445,#0f1724); border-radius:8px; position:relative; overflow:visible; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); transform:translateY(28px); opacity:0; }
+.building .floor .brick-row { position:absolute; left:8px; right:8px; bottom:-14px; height:14px; background-image: repeating-linear-gradient(90deg, #b45309 0 18px, #92400e 18px 36px); border-radius:4px; transform-origin:left center; }
+
+/* Vehicles and heavy machinery */
+.vehicle { position:absolute; bottom:8px; width:120px; height:48px; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,0.6); transform-origin:center; }
+.vehicle.dump { left:12%; background:linear-gradient(90deg,#b45309,#92400e); }
+.vehicle.excavator { left:22%; background:linear-gradient(90deg,#475569,#94a3b8); }
+.vehicle.bulldozer { left:32%; background:linear-gradient(90deg,#111827,#0b1220); }
+
+/* Workers (many variants) */
+.worker { position:absolute; width:36px; height:72px; border-radius:8px; box-shadow:0 12px 30px rgba(0,0,0,0.6); transform-origin:center bottom; }
+.worker.helmet { background:linear-gradient(180deg,#f59e0b,#b45309); }
+.worker.blue { background:linear-gradient(180deg,#3b82f6,#1e40af); }
+
+/* Props */
+.prop { position:absolute; border-radius:6px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+.prop.toolbox { width:44px;height:28px; left:10%; bottom:18px; background:linear-gradient(90deg,#3b82f6,#1e3a8a); }
+.prop.mixer { width:56px;height:56px; left:16%; bottom:18px; background:linear-gradient(90deg,#94a3b8,#475569); border-radius:8px; transform-origin:center; }
+.prop.cone { width:10px;height:18px; background:linear-gradient(180deg,var(--accent),#b45309); border-radius:3px; }
+
+/* Dust, smoke, sparks */
+.dust { position:absolute; width:120px; height:120px; background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 40%); filter:blur(6px); opacity:0.9; transform-origin:center; }
+.smoke { position:absolute; width:160px; height:80px; background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent); filter:blur(18px); opacity:0.6; }
 
 /* =========================
-   Electrical scene styles
+   Electrical scene base visuals
    ========================= */
-.scene--electrical{background:linear-gradient(180deg, rgba(59,130,246,0.02), transparent); border-radius:10px; padding:8px}
-.ladder{position:absolute; left:8%; bottom:12px; width:36px; height:220px; background:linear-gradient(180deg,#0b1220,#1f2937); border-radius:6px}
-.electrician{position:absolute; left:18%; bottom:40px; width:44px; height:84px; background:linear-gradient(180deg,#3b82f6,#0b1220); border-radius:8px; animation:climb 8s linear infinite}
-.cable-bank{position:absolute; right:8%; top:10%; width:120px; height:220px}
-.cable{position:absolute; left:0; width:6px; background:linear-gradient(180deg,#0b1220,#94a3b8); border-radius:6px}
-.cable.c1{height:160px; top:20px; left:10px; animation:cableSway 5s ease-in-out infinite}
-.cable.c2{height:200px; top:6px; left:36px; animation:cableSway 6s ease-in-out infinite}
-.cable.c3{height:120px; top:60px; left:62px; animation:cableSway 4.5s ease-in-out infinite}
-.control-rack{position:absolute; right:6%; bottom:12px; width:160px; height:120px; background:linear-gradient(180deg,#0b1220,#111827); border-radius:8px; padding:8px; box-shadow:inset 0 -6px 18px rgba(0,0,0,0.6)}
-.oscilloscope{height:36px;background:linear-gradient(90deg,#071226,#0b1220); border-radius:6px; box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); position:relative; overflow:hidden}
-.oscilloscope::after{content:""; position:absolute; left:-40%; top:50%; width:200%; height:2px; background:linear-gradient(90deg, transparent, rgba(59,130,246,0.6), transparent); transform:translateY(-50%); animation:wave 2.6s linear infinite}
-.led-row{display:flex; gap:8px; margin-top:8px}
-.led{width:10px;height:10px;border-radius:50%; background:#071226; box-shadow:0 0 8px rgba(0,0,0,0.6)}
-.led.green{background:linear-gradient(90deg,var(--success),#064e3b); box-shadow:0 0 12px rgba(16,185,129,0.6); animation:ledPulse 1.6s linear infinite}
-.led.blue{background:linear-gradient(90deg,var(--accent-2),#1e3a8a); box-shadow:0 0 12px rgba(59,130,246,0.6); animation:ledPulse 2.2s linear infinite}
-.led.amber{background:linear-gradient(90deg,var(--accent),#92400e); box-shadow:0 0 12px rgba(245,158,11,0.6); animation:ledPulse 2.8s linear infinite}
-.fuse-slot{width:36px;height:18px;background:linear-gradient(90deg,#94a3b8,#475569); border-radius:6px; margin-top:8px; position:relative; overflow:hidden}
-.fan{position:absolute; right:8px; top:8px; width:36px;height:36px; border-radius:50%; background:linear-gradient(90deg,#0b1220,#1f2937); box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); animation:fanSpin 2.6s linear infinite}
-.sparks{position:absolute; left:46%; top:28%; width:40px;height:40px; background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 40%); filter:blur(6px); animation:sparkBurst 3s linear infinite}
-.bulb{position:absolute; left:50%; top:6%; width:28px;height:48px; background:linear-gradient(180deg,#fef3c7,#f59e0b); border-radius:6px; box-shadow:0 10px 30px rgba(245,158,11,0.12); animation:bulbFlicker 4s linear infinite}
-.electro-sign{position:absolute; left:6%; top:8%; color:var(--accent); font-weight:800; opacity:0.9}
+.scene--electrical{
+  background:
+    linear-gradient(180deg, rgba(59,130,246,0.02), transparent),
+    radial-gradient(400px 160px at 80% 10%, rgba(245,158,11,0.02), transparent 10%);
+  border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+}
+
+/* Cabinets, transformers, panels */
+.transformer { position:absolute; left:8%; bottom:12px; width:160px; height:220px; background:linear-gradient(180deg,#0b1220,#0f1724); border-radius:8px; padding:8px; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); }
+.panel-unit { position:absolute; right:8%; bottom:12px; width:180px; height:220px; background:linear-gradient(180deg,#071226,#111827); border-radius:8px; padding:8px; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); }
+
+/* Circuit breakers, switches, meters */
+.breaker { width:18px;height:36px;border-radius:4px;background:linear-gradient(180deg,#111827,#0b1220); margin:6px; display:inline-block; box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); }
+.meter { width:100%; height:36px; background:linear-gradient(90deg,#071226,#0b1220); border-radius:6px; position:relative; overflow:hidden; }
+.meter .needle { position:absolute; left:50%; top:50%; width:2px; height:60%; background:linear-gradient(90deg,#3b82f6,#f59e0b); transform-origin:bottom center; transform:rotate(-20deg); }
+
+/* Cable trays and hanging wires */
+.cable-tray { position:absolute; left:20%; top:12%; width:60%; height:8px; background:linear-gradient(90deg,#0b1220,#94a3b8); border-radius:6px; box-shadow:inset 0 -6px 18px rgba(0,0,0,0.6); }
+.hanging-wire { position:absolute; width:4px; background:linear-gradient(180deg,#b45309,#92400e); border-radius:4px; }
+
+/* Sparks, arcs, flashes */
+.arc { position:absolute; width:6px; height:6px; background:radial-gradient(circle, rgba(255,255,255,1), rgba(59,130,246,1)); border-radius:50%; filter:blur(2px); }
+
+/* Oscilloscope */
+.osc { position:absolute; left:10%; top:8%; width:120px; height:60px; background:linear-gradient(90deg,#071226,#0b1220); border-radius:6px; overflow:hidden; box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); }
+.osc .trace { position:absolute; left:-40%; top:50%; width:200%; height:2px; background:linear-gradient(90deg, transparent, rgba(59,130,246,0.6), transparent); transform:translateY(-50%); }
 
 /* =========================
-   Infrastructure scene styles
+   Infrastructure scene base visuals
    ========================= */
-.scene--infra{background:linear-gradient(180deg, rgba(16,185,129,0.01), transparent); border-radius:10px; padding:8px}
-.server-rack{position:absolute; left:8%; bottom:12px; width:140px; height:220px; background:linear-gradient(180deg,#0b1220,#0f1724); border-radius:8px; padding:8px; box-shadow:inset 0 -6px 18px rgba(0,0,0,0.6)}
-.server{height:48%; margin-bottom:8px; border-radius:6px; background:linear-gradient(90deg,#071226,#1f2937); padding:8px; display:flex; align-items:center; justify-content:flex-end}
-.s-led{width:8px;height:8px;border-radius:50%; background:#071226; box-shadow:0 0 8px rgba(0,0,0,0.6)}
-.s-led.s1{background:linear-gradient(90deg,var(--success),#064e3b); animation:ledPulse 1.6s linear infinite}
-.s-led.s2{background:linear-gradient(90deg,var(--accent-2),#1e3a8a); animation:ledPulse 2.2s linear infinite}
-.s-led.s3{background:linear-gradient(90deg,var(--accent),#92400e); animation:ledPulse 2.8s linear infinite}
-.engineer{position:absolute; right:8%; bottom:40px; width:56px; height:96px}
-.engineer-body{width:44px;height:72px;background:linear-gradient(180deg,#3b82f6,#0b1220); border-radius:8px}
-.wrench{position:absolute; right:-6px; bottom:6px; width:18px;height:36px;background:linear-gradient(90deg,#94a3b8,#475569); border-radius:4px; transform-origin:center; animation:wrenchSpin 3s linear infinite}
-.network-visual{position:absolute; right:6%; top:8%; width:160px; height:120px}
-.ethernet{position:absolute; left:6px; top:6px; width:120px; height:8px; background:linear-gradient(90deg,#3b82f6,#0b1220); border-radius:6px; box-shadow:0 10px 30px rgba(0,0,0,0.6); animation:ethernetPulse 4s linear infinite}
-.packets{position:absolute; left:6px; bottom:6px; display:flex; gap:8px}
-.packet{width:10px;height:8px;background:linear-gradient(90deg,#f59e0b,#3b82f6); border-radius:2px; animation:packetFloat 3s linear infinite}
-.cloud-sync{position:absolute; right:6px; top:6px; width:36px;height:24px; background:linear-gradient(90deg,#94a3b8,#3b82f6); border-radius:6px; box-shadow:0 10px 30px rgba(0,0,0,0.6); animation:cloudPulse 5s linear infinite}
-.pipeline{position:absolute; left:40%; bottom:12px; width:180px; height:120px}
-.pipe{width:100%; height:28px; background:linear-gradient(90deg,#0b1220,#1f2937); border-radius:14px; overflow:hidden; position:relative}
-.liquid{position:absolute; left:-40%; top:0; height:100%; width:60%; background:linear-gradient(90deg, rgba(59,130,246,0.6), rgba(16,185,129,0.6)); animation:liquidFlow 3.6s linear infinite}
-.gearset{position:absolute; right:6%; bottom:6%; display:flex; gap:8px}
-.gearset .gear{width:36px;height:36px;border:4px solid rgba(255,255,255,0.03); border-radius:50%; animation:gearSpin 6s linear infinite}
+.scene--infra{
+  background:
+    linear-gradient(180deg, rgba(16,185,129,0.01), transparent),
+    radial-gradient(500px 200px at 10% 10%, rgba(59,130,246,0.02), transparent 10%);
+  border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+}
+
+/* Server racks, doors, rails */
+.rack { position:absolute; left:8%; bottom:12px; width:140px; height:320px; background:linear-gradient(180deg,#071226,#0f1724); border-radius:8px; padding:8px; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); }
+.server-unit { height:48px; margin-bottom:8px; border-radius:6px; background:linear-gradient(90deg,#0b1220,#1f2937); padding:8px; display:flex; align-items:center; justify-content:flex-end; position:relative; overflow:hidden; }
+.server-unit .led { width:8px;height:8px;border-radius:50%; margin-left:6px; box-shadow:0 0 8px rgba(0,0,0,0.6); }
+
+/* Cable trays and fiber optics */
+.fiber { position:absolute; right:8%; top:12%; width:160px; height:8px; background:linear-gradient(90deg,#3b82f6,#0b1220); border-radius:6px; box-shadow:inset 0 -6px 18px rgba(0,0,0,0.6); }
+.packet { width:10px;height:8px;border-radius:2px;background:linear-gradient(90deg,#f59e0b,#3b82f6); position:absolute; bottom:6px; }
+
+/* Pipelines and liquid */
+.pipe { position:absolute; left:40%; bottom:12px; width:220px; height:28px; background:linear-gradient(90deg,#0b1220,#1f2937); border-radius:14px; overflow:hidden; }
+.liquid { position:absolute; left:-40%; top:0; height:100%; width:60%; background:linear-gradient(90deg, rgba(59,130,246,0.6), rgba(16,185,129,0.6)); transform-origin:left center; }
+
+/* Cooling fans and vents */
+.fan { position:absolute; right:6%; bottom:40px; width:56px; height:56px; border-radius:50%; background:linear-gradient(90deg,#0b1220,#1f2937); box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); }
 
 /* =========================
    Side cards: progress + contact
