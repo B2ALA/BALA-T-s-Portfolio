@@ -1,299 +1,147 @@
-/* css/style.css
-   Ultra-premium maintenance page base styles.
-   - Organized variables
-   - Glassmorphism, depth, and responsive layout
-   - Comments explain structure and intent
-*/
-
 /* =========================
-   Design tokens / variables
+   Infrastructure: Binary Data Center Styles
    ========================= */
-:root{
-  /* Palette */
-  --bg: #0B1220;
-  --card: #182235;
-  --accent: #F59E0B;
-  --accent-2: #3B82F6;
-  --danger: #EF4444;
-  --success: #10B981;
-  --text: #FFFFFF;
-  --muted: #CBD5E1;
 
-  /* Layout */
-  --max-width: 1280px;
-  --radius: 14px;
-  --glass-alpha: 0.06;
-  --glass-border: rgba(255,255,255,0.06);
-  --shadow-1: 0 8px 30px rgba(2,6,23,0.6);
-  --shadow-2: 0 18px 60px rgba(2,6,23,0.75);
-
-  /* Motion */
-  --ease: cubic-bezier(.2,.9,.3,1);
-
-  /* Typography */
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+/* container for binary streams (positioned above racks) */
+.binary-streams {
+  position: absolute;
+  inset: 28px 18px 28px 18px; /* align inside panel padding */
+  pointer-events: none;
+  z-index: 40;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
 }
 
-/* =========================
-   Base reset & layout
-   ========================= */
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:var(--font-sans);
-  background:var(--bg);
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  line-height:1.35;
-  overflow-x:hidden;
+/* each stream column */
+.binary-stream {
+  width: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  text-align: center;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #00FF41;
+  text-shadow:
+    0 0 5px #00ff41,
+    0 0 10px #00ff41,
+    0 0 20px #00ff41;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.9;
 }
 
-/* App container */
-.app{min-height:100vh; display:flex; flex-direction:column; align-items:center; position:relative;}
-
-/* =========================
-   Background layers
-   ========================= */
-.bg{position:fixed; inset:0; z-index:0; pointer-events:none}
-.bg-gradient{
-  position:absolute; inset:0;
-  background:
-    radial-gradient(900px 420px at 10% 12%, rgba(59,130,246,0.06), transparent 8%),
-    radial-gradient(700px 320px at 88% 78%, rgba(245,158,11,0.04), transparent 8%),
-    linear-gradient(180deg, rgba(11,18,32,1) 0%, rgba(6,10,18,1) 100%);
-  filter:blur(18px) saturate(110%);
-  animation:gradientShift 20s linear infinite;
-  opacity:0.95;
+/* individual digit */
+.binary-digit {
+  display: block;
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+  transition: opacity 300ms linear, transform 300ms linear, filter 300ms linear;
+  color: #00E676;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 6px rgba(0,255,65,0.12));
 }
 
-/* Blueprint grid overlay */
-.blueprint-grid{
-  position:absolute; inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 56px 56px;
-  opacity:0.06;
-  mix-blend-mode:overlay;
-  transform:translateZ(0);
-  animation:gridDrift 28s linear infinite;
+/* brighter highlight variant */
+.binary-digit.bright {
+  color: #66FF99;
+  text-shadow:
+    0 0 8px #66ff99,
+    0 0 14px #00ff41,
+    0 0 28px #00ff41;
+  transform: scale(1.18);
+  opacity: 1;
 }
 
-/* Volumetric beams */
-.bg-lights .beam{position:absolute; width:420px; height:420px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,255,255,0.03), transparent 40%); filter:blur(40px); mix-blend-mode:screen; opacity:0.6}
-.bg-lights .b1{left:6%; top:6%; animation:lightDrift 24s linear infinite}
-.bg-lights .b2{right:8%; top:12%; width:520px;height:520px; animation:lightDrift 32s linear infinite}
-.bg-lights .b3{left:40%; top:2%; width:360px;height:360px; animation:lightDrift 20s linear infinite}
-
-/* Floating decorative objects */
-.bg-objects .gear{position:absolute; border-radius:50%; border:6px solid rgba(255,255,255,0.03); box-shadow:inset 0 0 18px rgba(255,255,255,0.02)}
-.bg-objects .g1{left:6%; top:60%; width:84px;height:84px; animation:gearSpin 12s linear infinite}
-.bg-objects .g2{right:8%; top:40%; width:56px;height:56px; animation:gearSpin 9s linear reverse infinite}
-.bg-objects .star{position:absolute; width:6px;height:6px; background:rgba(255,255,255,0.9); border-radius:50%; filter:blur(1px); opacity:0.9}
-.bg-objects .s1{left:20%; top:10%; animation:twinkle 6s linear infinite}
-.bg-objects .s2{right:20%; top:30%; animation:twinkle 8s linear infinite}
-
-/* Canvas for particles (JS-driven) */
-.bg-canvas{position:absolute; inset:0; z-index:1; opacity:0.95}
-
-/* Lens flare & fog */
-.lensflare{position:absolute; left:50%; top:6%; width:600px;height:600px; transform:translateX(-50%); background:radial-gradient(closest-side, rgba(255,255,255,0.02), transparent 40%); filter:blur(40px); mix-blend-mode:screen; opacity:0.5}
-.fog-layer{position:absolute; left:-10%; bottom:6%; width:1400px;height:220px; background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent); filter:blur(30px); animation:fogMove 22s linear infinite; opacity:0.45}
-
-/* =========================
-   Header / Hero
-   ========================= */
-.header{position:relative; z-index:10; width:100%; display:flex; justify-content:center; padding:28px 20px 6px}
-.header-inner{max-width:var(--max-width); width:100%; display:flex; flex-direction:column; align-items:center; gap:12px}
-.brand{background:transparent; border:0; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:6px; border-radius:10px; box-shadow:var(--shadow-1); transition:transform 220ms var(--ease)}
-.brand:focus{outline:3px solid rgba(59,130,246,0.12); outline-offset:6px}
-.title{margin:0; font-size:clamp(18px,4.2vw,36px); letter-spacing:0.02em; font-weight:800; text-transform:uppercase; color:var(--text); text-align:center; text-shadow:0 10px 40px rgba(2,6,23,0.6)}
-.subtitle{margin:6px 0 0; color:var(--muted); font-weight:600; text-align:center}
-.subdesc{margin:6px 0 0; color:var(--muted); text-align:center; max-width:880px}
-
-/* =========================
-   Main layout: panels + side
-   ========================= */
-.main{position:relative; z-index:10; width:100%; max-width:var(--max-width); margin:18px auto; padding:18px; display:grid; grid-template-columns: 1fr 360px; gap:20px; align-items:start}
-
-/* Panels container */
-.panels{display:grid; grid-template-columns: repeat(3, 1fr); gap:18px}
-
-/* Panel base (glass card) */
-.panel{
-  position:relative;
-  border-radius:var(--radius);
-  padding:14px;
-  min-height:520px;
-  background:linear-gradient(180deg, rgba(255,255,255,var(--glass-alpha)), rgba(255,255,255,0.02));
-  border:1px solid var(--glass-border);
-  box-shadow:var(--shadow-1);
-  backdrop-filter: blur(10px) saturate(120%);
-  transition:transform 400ms var(--ease), box-shadow 400ms var(--ease);
-  transform-style:preserve-3d;
-  overflow:hidden;
-}
-.panel:focus{outline:2px solid rgba(59,130,246,0.08)}
-.panel:hover{transform:translateY(-8px) rotateX(1deg); box-shadow:var(--shadow-2)}
-
-/* Panel title */
-.panel-title{margin:0 0 10px 0; color:var(--muted); font-weight:700; font-size:0.95rem}
-
-/* Scenes common */
-.scene{position:relative; height:420px; display:block; perspective:1400px}
-
-/* =========================
-   Construction scene base visuals
-   ========================= */
-.scene--construction{
-  background:
-    linear-gradient(180deg, rgba(245,158,11,0.01), transparent),
-    radial-gradient(600px 200px at 20% 10%, rgba(59,130,246,0.02), transparent 10%);
-  border-radius:10px; padding:8px; overflow:hidden;
-  box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+/* faded variant */
+.binary-digit.faint {
+  opacity: 0.18;
+  transform: scale(0.92);
+  filter: blur(0.6px) brightness(0.9);
 }
 
-/* We'll create many elements via JS. Provide base classes for each type. */
+/* server racks SVG container styling */
+.infra-svg { width:100%; height:100%; position:absolute; inset:0; z-index:10; pointer-events:none; }
 
-/* Crane (complex, many parts) */
-.crane {
-  position:absolute; left:6%; bottom:12px; width:420px; height:420px; transform-origin:left bottom; z-index:40;
-  pointer-events:none;
-}
-.crane .tower { position:absolute; left:120px; bottom:0; width:28px; height:320px; background:linear-gradient(180deg,#1f2937,#0b1220); border-radius:6px; box-shadow:inset 0 0 18px rgba(255,255,255,0.02); transform-origin:center bottom; }
-.crane .arm { position:absolute; left:148px; bottom:300px; width:520px; height:18px; background:linear-gradient(90deg,#0b1220,#111827); border-radius:8px; transform-origin:20px 9px; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
-.crane .counter { position:absolute; left:-36px; top:-12px; width:64px; height:36px; background:linear-gradient(90deg,var(--accent),#b45309); border-radius:6px; box-shadow:0 12px 40px rgba(245,158,11,0.12); }
-.crane .hook { position:absolute; right:18px; top:12px; width:40px; height:120px; display:flex; align-items:flex-start; justify-content:center; z-index:60; }
-.crane .hook .line { width:3px; height:72px; background:linear-gradient(180deg,#94a3b8,#0b1220); margin-bottom:6px; transform-origin:top center; }
-.crane .hook .body { width:22px; height:22px; border-radius:4px; background:#071226; border:3px solid var(--muted); box-shadow:0 12px 40px rgba(0,0,0,0.6); }
+/* server rack group styling (SVG children will be created by JS) */
+.rack { opacity: 0.95; transform-origin: center; }
 
-/* Building floors (we animate many floors) */
-.building { position:absolute; right:6%; bottom:12px; width:260px; height:360px; display:flex; align-items:flex-end; justify-content:center; z-index:30; }
-.building .floor { width:94%; height:44px; background:linear-gradient(180deg,#263445,#0f1724); border-radius:8px; position:relative; overflow:visible; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); transform:translateY(28px); opacity:0; }
-.building .floor .brick-row { position:absolute; left:8px; right:8px; bottom:-14px; height:14px; background-image: repeating-linear-gradient(90deg, #b45309 0 18px, #92400e 18px 36px); border-radius:4px; transform-origin:left center; }
-
-/* Vehicles and heavy machinery */
-.vehicle { position:absolute; bottom:8px; width:120px; height:48px; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,0.6); transform-origin:center; }
-.vehicle.dump { left:12%; background:linear-gradient(90deg,#b45309,#92400e); }
-.vehicle.excavator { left:22%; background:linear-gradient(90deg,#475569,#94a3b8); }
-.vehicle.bulldozer { left:32%; background:linear-gradient(90deg,#111827,#0b1220); }
-
-/* Workers (many variants) */
-.worker { position:absolute; width:36px; height:72px; border-radius:8px; box-shadow:0 12px 30px rgba(0,0,0,0.6); transform-origin:center bottom; }
-.worker.helmet { background:linear-gradient(180deg,#f59e0b,#b45309); }
-.worker.blue { background:linear-gradient(180deg,#3b82f6,#1e40af); }
-
-/* Props */
-.prop { position:absolute; border-radius:6px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
-.prop.toolbox { width:44px;height:28px; left:10%; bottom:18px; background:linear-gradient(90deg,#3b82f6,#1e3a8a); }
-.prop.mixer { width:56px;height:56px; left:16%; bottom:18px; background:linear-gradient(90deg,#94a3b8,#475569); border-radius:8px; transform-origin:center; }
-.prop.cone { width:10px;height:18px; background:linear-gradient(180deg,var(--accent),#b45309); border-radius:3px; }
-
-/* Dust, smoke, sparks */
-.dust { position:absolute; width:120px; height:120px; background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 40%); filter:blur(6px); opacity:0.9; transform-origin:center; }
-.smoke { position:absolute; width:160px; height:80px; background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent); filter:blur(18px); opacity:0.6; }
-
-/* =========================
-   Electrical scene base visuals
-   ========================= */
-.scene--electrical{
-  background:
-    linear-gradient(180deg, rgba(59,130,246,0.02), transparent),
-    radial-gradient(400px 160px at 80% 10%, rgba(245,158,11,0.02), transparent 10%);
-  border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+/* LED dot style (SVG circles) */
+.led {
+  filter: url(#ledGlow);
 }
 
-/* Cabinets, transformers, panels */
-.transformer { position:absolute; left:8%; bottom:12px; width:160px; height:220px; background:linear-gradient(180deg,#0b1220,#0f1724); border-radius:8px; padding:8px; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); }
-.panel-unit { position:absolute; right:8%; bottom:12px; width:180px; height:220px; background:linear-gradient(180deg,#071226,#111827); border-radius:8px; padding:8px; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); }
-
-/* Circuit breakers, switches, meters */
-.breaker { width:18px;height:36px;border-radius:4px;background:linear-gradient(180deg,#111827,#0b1220); margin:6px; display:inline-block; box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); }
-.meter { width:100%; height:36px; background:linear-gradient(90deg,#071226,#0b1220); border-radius:6px; position:relative; overflow:hidden; }
-.meter .needle { position:absolute; left:50%; top:50%; width:2px; height:60%; background:linear-gradient(90deg,#3b82f6,#f59e0b); transform-origin:bottom center; transform:rotate(-20deg); }
-
-/* Cable trays and hanging wires */
-.cable-tray { position:absolute; left:20%; top:12%; width:60%; height:8px; background:linear-gradient(90deg,#0b1220,#94a3b8); border-radius:6px; box-shadow:inset 0 -6px 18px rgba(0,0,0,0.6); }
-.hanging-wire { position:absolute; width:4px; background:linear-gradient(180deg,#b45309,#92400e); border-radius:4px; }
-
-/* Sparks, arcs, flashes */
-.arc { position:absolute; width:6px; height:6px; background:radial-gradient(circle, rgba(255,255,255,1), rgba(59,130,246,1)); border-radius:50%; filter:blur(2px); }
-
-/* Oscilloscope */
-.osc { position:absolute; left:10%; top:8%; width:120px; height:60px; background:linear-gradient(90deg,#071226,#0b1220); border-radius:6px; overflow:hidden; box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); }
-.osc .trace { position:absolute; left:-40%; top:50%; width:200%; height:2px; background:linear-gradient(90deg, transparent, rgba(59,130,246,0.6), transparent); transform:translateY(-50%); }
-
-/* =========================
-   Infrastructure scene base visuals
-   ========================= */
-.scene--infra{
-  background:
-    linear-gradient(180deg, rgba(16,185,129,0.01), transparent),
-    radial-gradient(500px 200px at 10% 10%, rgba(59,130,246,0.02), transparent 10%);
-  border-radius:10px; padding:8px; overflow:hidden; box-shadow: inset 0 -40px 80px rgba(2,6,23,0.25);
+/* packets (SVG rectangles with glow) */
+.packet {
+  fill: #00E676;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 8px rgba(0,230,118,0.18));
 }
 
-/* Server racks, doors, rails */
-.rack { position:absolute; left:8%; bottom:12px; width:140px; height:320px; background:linear-gradient(180deg,#071226,#0f1724); border-radius:8px; padding:8px; box-shadow:inset 0 -8px 24px rgba(0,0,0,0.6); }
-.server-unit { height:48px; margin-bottom:8px; border-radius:6px; background:linear-gradient(90deg,#0b1220,#1f2937); padding:8px; display:flex; align-items:center; justify-content:flex-end; position:relative; overflow:hidden; }
-.server-unit .led { width:8px;height:8px;border-radius:50%; margin-left:6px; box-shadow:0 0 8px rgba(0,0,0,0.6); }
+/* circuit lines */
+.circuit-line {
+  stroke: rgba(0,255,65,0.06);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(0,255,65,0.06));
+}
 
-/* Cable trays and fiber optics */
-.fiber { position:absolute; right:8%; top:12%; width:160px; height:8px; background:linear-gradient(90deg,#3b82f6,#0b1220); border-radius:6px; box-shadow:inset 0 -6px 18px rgba(0,0,0,0.6); }
-.packet { width:10px;height:8px;border-radius:2px;background:linear-gradient(90deg,#f59e0b,#3b82f6); position:absolute; bottom:6px; }
+/* pulse effect (animated stroke) */
+.circuit-pulse {
+  stroke: rgba(59,130,246,0.18);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 12px rgba(59,130,246,0.12));
+  opacity: 0;
+}
 
-/* Pipelines and liquid */
-.pipe { position:absolute; left:40%; bottom:12px; width:220px; height:28px; background:linear-gradient(90deg,#0b1220,#1f2937); border-radius:14px; overflow:hidden; }
-.liquid { position:absolute; left:-40%; top:0; height:100%; width:60%; background:linear-gradient(90deg, rgba(59,130,246,0.6), rgba(16,185,129,0.6)); transform-origin:left center; }
+/* floating labels */
+.infra-labels {
+  position: absolute;
+  inset: 18px;
+  z-index: 50;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  align-content: start;
+}
+.infra-label {
+  justify-self: start;
+  background: rgba(0,0,0,0.28);
+  color: #00FF41;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-weight: 700;
+  font-size: 11px;
+  text-shadow: 0 0 6px rgba(0,255,65,0.08);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 800ms ease, transform 800ms ease;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
 
-/* Cooling fans and vents */
-.fan { position:absolute; right:6%; bottom:40px; width:56px; height:56px; border-radius:50%; background:linear-gradient(90deg,#0b1220,#1f2937); box-shadow:inset 0 6px 18px rgba(0,0,0,0.6); }
+/* show label */
+.infra-label.show { opacity: 1; transform: translateY(0); }
 
-/* =========================
-   Side cards: progress + contact
-   ========================= */
-.side{display:flex; flex-direction:column; gap:18px; align-items:stretch}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; border:1px solid var(--glass-border); box-shadow:var(--shadow-1); backdrop-filter: blur(8px) saturate(120%)}
-.card--progress{position:sticky; top:28px}
-.card-head{display:flex; align-items:center; justify-content:space-between; gap:12px}
-.card-title{margin:0; color:var(--muted); font-weight:700}
-.progress-percent{font-weight:900; font-size:1.6rem; color:var(--text)}
-.progress-track{position:relative; height:14px; background:rgba(255,255,255,0.03); border-radius:999px; overflow:hidden; margin-top:12px; border:1px solid rgba(255,255,255,0.02)}
-.progress-glow{position:absolute; left:0; top:-6px; height:26px; width:40%; background:linear-gradient(90deg, rgba(59,130,246,0.12), rgba(245,158,11,0.12)); filter:blur(18px); opacity:0.9; transform:translateX(-10%); animation:glowSweep 3.6s linear infinite}
-.progress-fill{position:absolute; left:0; top:0; bottom:0; width:61%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); box-shadow:0 12px 40px rgba(59,130,246,0.08); transition:width 1.2s var(--ease)}
-.status-rotator{margin-top:12px; color:var(--muted); font-weight:700; min-height:28px; display:flex; align-items:center}
+/* overlay vignette */
+.infra-overlay {
+  position:absolute; inset:0; z-index:60; pointer-events:none;
+  background: radial-gradient(600px 200px at 50% 10%, rgba(0,255,65,0.02), transparent 20%), linear-gradient(180deg, rgba(0,0,0,0.12), transparent 40%);
+  mix-blend-mode: overlay;
+}
 
-/* Live grid */
-.live-grid{margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px; color:var(--muted); font-size:0.95rem}
-.live-row{display:flex; justify-content:space-between; gap:8px}
-.label{opacity:0.9}
-.value{font-weight:700; color:var(--text)}
-
-/* Contact card */
-.card--contact .contact{display:flex; flex-direction:column; gap:8px}
-.contact-mail{color:var(--accent-2); text-decoration:none; font-weight:700}
-
-/* Footer note */
-.footer-note{margin-top:12px; color:var(--muted); font-size:0.85rem}
-
-/* =========================
-   Responsive
-   ========================= */
+/* responsive tweaks */
 @media (max-width:1100px){
-  .main{grid-template-columns: 1fr; padding:12px}
-  .panels{grid-template-columns: 1fr; grid-auto-rows:auto}
-  .side{order:2}
-  .card--progress{position:relative; top:auto}
+  .binary-streams { gap: 4px; }
+  .binary-stream { width: 14px; font-size: 11px; }
+  .infra-labels { grid-template-columns: repeat(2, 1fr); }
 }
-
-/* =========================
-   Accessibility focus states
-   ========================= */
-button:focus, .panel:focus, .card:focus{outline:3px solid rgba(59,130,246,0.12); outline-offset:6px}
-
-/* =========================
-   Utility classes
-   ========================= */
-.hidden{display:none}
