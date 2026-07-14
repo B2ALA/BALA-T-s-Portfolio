@@ -1,6 +1,6 @@
 /* css/animations.css
-   All keyframes and animation-specific styles separated for clarity.
-   Focus on GPU-friendly transforms (translate, scale, rotate, opacity).
+   Keyframes and animation helpers.
+   All animations use transform/opacity/filter for GPU acceleration.
 */
 
 /* -------------------------
@@ -31,11 +31,14 @@
   50%{opacity:1; transform:scale(1.2)}
   100%{opacity:0.2; transform:scale(0.8)}
 }
+@keyframes gearSpin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
 
 /* -------------------------
    Construction animations
    ------------------------- */
-/* Crane arm rotation (slow, variable via inline CSS vars) */
 @keyframes craneRotate {
   0%{transform:rotate(-8deg)}
   25%{transform:rotate(10deg)}
@@ -43,30 +46,22 @@
   75%{transform:rotate(12deg)}
   100%{transform:rotate(-8deg)}
 }
-
-/* Hook lift/lower with slight swing */
 @keyframes hookLift {
   0%{transform:translateY(0) rotate(0deg)}
   30%{transform:translateY(36px) rotate(2deg)}
   60%{transform:translateY(-6px) rotate(-2deg)}
   100%{transform:translateY(0) rotate(0deg)}
 }
-
-/* Floor rise (staggered) */
 @keyframes floorRise {
   0%{transform:translateY(28px) scaleY(0.98); opacity:0}
   40%{transform:translateY(0) scaleY(1.02); opacity:1}
   100%{transform:translateY(0) scaleY(1); opacity:1}
 }
-
-/* Brick placement (subtle pop and settle) */
 @keyframes brickPlace {
   0%{transform:translateY(-18px) scaleY(0.9); opacity:0}
   40%{transform:translateY(6px) scaleY(1.04); opacity:1}
   100%{transform:translateY(0) scaleY(1); opacity:1}
 }
-
-/* Worker walk (asynchronous) */
 @keyframes workerWalk {
   0%{transform:translateX(0) translateY(0)}
   25%{transform:translateX(18px) translateY(-2px)}
@@ -74,8 +69,11 @@
   75%{transform:translateX(18px) translateY(2px)}
   100%{transform:translateX(0) translateY(0)}
 }
-
-/* Worker actions (jackhammer, welding) */
+@keyframes workerCarry {
+  0%{transform:translateX(0) translateY(0)}
+  50%{transform:translateX(28px) translateY(-6px)}
+  100%{transform:translateX(0) translateY(0)}
+}
 @keyframes jackhammer {
   0%{transform:translateY(0)}
   50%{transform:translateY(6px)}
@@ -87,28 +85,20 @@
   60%{opacity:0.4; transform:scale(1)}
   100%{opacity:0; transform:scale(0.6)}
 }
-
-/* Mixer spin */
 @keyframes mixerSpin {
   0%{transform:rotate(0deg)}
   100%{transform:rotate(360deg)}
 }
-
-/* Vehicle movement (left-right loops) */
 @keyframes vehicleDrive {
   0%{transform:translateX(-6%)}
   50%{transform:translateX(18%)}
   100%{transform:translateX(-6%)}
 }
-
-/* Dust & falling particles */
 @keyframes dustFloat {
   0%{transform:translateY(0) scale(0.98); opacity:0.9}
   50%{transform:translateY(-18px) scale(1.02); opacity:0.6}
   100%{transform:translateY(0) scale(0.98); opacity:0.9}
 }
-
-/* Warning blink */
 @keyframes warnBlink {
   0%{opacity:1; box-shadow:0 0 18px rgba(245,158,11,0.6)}
   50%{opacity:0.4; box-shadow:0 0 6px rgba(245,158,11,0.2)}
@@ -188,16 +178,7 @@
 }
 
 /* -------------------------
-   Misc micro animations
-   ------------------------- */
-@keyframes workerPulse {
-  0%{transform:scale(1)}
-  50%{transform:scale(1.02)}
-  100%{transform:scale(1)}
-}
-
-/* -------------------------
-   Reduced motion support
+   Reduced motion
    ------------------------- */
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:0.001s !important; animation-iteration-count:1 !important; transition-duration:0.001s !important}
