@@ -1,0 +1,508 @@
+/* ==========================================================================
+   APEX OPS — Under Maintenance | Cyber-Industrial SCADA Dashboard
+   ========================================================================== */
+
+:root{
+  --bg:            #05070c;
+  --bg-deep:       #020305;
+  --neon-blue:     #00b8ff;
+  --neon-blue-dim: #0d3a52;
+  --amber:         #ff9f1a;
+  --amber-dim:     #7a4b0c;
+  --green:         #00ff88;
+  --red:           #ff3b3b;
+  --ink:           #eaf2fb;
+  --ink-dim:       #8fa2b8;
+  --glass-bg:      rgba(14,22,32,0.45);
+  --glass-border:  rgba(0,184,255,0.22);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 7px;
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+  min-height:100vh;
+  position:relative;
+  cursor:default;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+
+.mono{ font-family:var(--font-mono); letter-spacing:0.04em; }
+
+/* ==========================================================================
+   BACKGROUND LAYERS
+   ========================================================================== */
+.bg-layers{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+
+.bg-sky{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 20% -10%, rgba(0,140,255,0.10), transparent 60%),
+    radial-gradient(ellipse 900px 500px at 85% 0%, rgba(255,159,26,0.08), transparent 60%),
+    radial-gradient(ellipse 1400px 900px at 50% 110%, rgba(0,90,150,0.10), transparent 60%),
+    linear-gradient(180deg, #05070c 0%, #060a12 45%, #04070c 100%);
+  animation: skyDrift 40s ease-in-out infinite alternate;
+}
+@keyframes skyDrift{ 0%{ filter:brightness(1);} 100%{ filter:brightness(1.07);} }
+
+.bg-city{
+  position:absolute; left:0; right:0; bottom:0; height:38%;
+  background-image: repeating-linear-gradient(90deg, rgba(10,16,24,0.9) 0 26px, rgba(6,10,16,0.9) 26px 46px);
+  clip-path: polygon(0% 100%, 0% 40%, 3% 40%, 3% 60%, 7% 60%, 7% 20%, 11% 20%, 11% 55%, 15% 55%, 15% 35%, 20% 35%, 20% 65%, 26% 65%, 26% 15%, 31% 15%, 31% 50%, 37% 50%, 37% 30%, 42% 30%, 42% 60%, 48% 60%, 48% 10%, 54% 10%, 54% 45%, 60% 45%, 60% 25%, 66% 25%, 66% 55%, 72% 55%, 72% 18%, 78% 18%, 78% 48%, 84% 48%, 84% 30%, 90% 30%, 90% 58%, 96% 58%, 96% 22%, 100% 22%, 100% 100%);
+  opacity:0.5;
+  animation: paraCity 60s linear infinite alternate;
+}
+@keyframes paraCity{ 0%{ transform:translateX(0);} 100%{ transform:translateX(-1.5%);} }
+
+.bg-rays{
+  position:absolute; inset:0;
+  background:
+    conic-gradient(from 200deg at 30% 0%, transparent 0deg, rgba(0,184,255,0.05) 6deg, transparent 14deg, transparent 40deg, rgba(0,184,255,0.04) 46deg, transparent 54deg),
+    conic-gradient(from 250deg at 80% 0%, transparent 0deg, rgba(255,159,26,0.05) 8deg, transparent 18deg);
+  mix-blend-mode: screen;
+  animation: raysSway 18s ease-in-out infinite alternate;
+}
+@keyframes raysSway{ 0%{ opacity:0.6; transform:translateX(-1%);} 100%{ opacity:1; transform:translateX(1%);} }
+
+#particleCanvas{ position:absolute; inset:0; width:100%; height:100%; }
+
+.bg-fog{
+  position:absolute; left:-10%; width:120%; height:220px; border-radius:50%;
+  background:radial-gradient(ellipse at center, rgba(0,60,90,0.16), transparent 70%);
+  filter:blur(6px);
+}
+.fog-1{ bottom:8%; animation: fogDrift 34s linear infinite; }
+.fog-2{ bottom:22%; height:160px; opacity:0.6; animation: fogDrift 48s linear infinite reverse; }
+@keyframes fogDrift{ 0%{ transform:translateX(-6%);} 50%{ transform:translateX(6%);} 100%{ transform:translateX(-6%);} }
+
+.scan-grid{
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(0,184,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,184,255,0.035) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent 90%);
+  opacity:0.5;
+}
+
+.vignette{
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 90% 90% at 50% 45%, transparent 55%, rgba(0,0,0,0.55) 100%);
+}
+
+.cursor-glow{
+  position:fixed; width:280px; height:280px; border-radius:50%;
+  background:radial-gradient(circle, rgba(0,184,255,0.10), transparent 70%);
+  pointer-events:none; z-index:2; transform:translate(-50%,-50%);
+  transition: opacity 0.3s ease; opacity:0;
+}
+
+/* ==========================================================================
+   TOP BAR
+   ========================================================================== */
+.topbar{
+  position:relative; z-index:5;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px clamp(16px,3vw,40px);
+  border-bottom:1px solid rgba(0,184,255,0.15);
+  background:linear-gradient(180deg, rgba(5,8,14,0.7), transparent);
+}
+.brand{ display:flex; align-items:center; gap:9px; font-family:var(--font-display); font-size:14px; letter-spacing:0.12em; color:var(--ink); }
+.brand strong{ color:var(--neon-blue); }
+.brand-pulse{ animation:pulseDot 2.4s ease-in-out infinite; }
+.topbar-status{ display:flex; align-items:center; gap:10px; font-size:12px; color:var(--ink-dim); }
+.dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+.dot-live{ background:var(--green); box-shadow:0 0 8px var(--green); animation:pulseDot 1.6s ease-in-out infinite; }
+.divider{ opacity:0.3; }
+
+/* ==========================================================================
+   GLASS CARD PRIMITIVE
+   ========================================================================== */
+.glass-card{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-lg);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(0,184,255,0.04);
+  position:relative;
+  transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.glass-card::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:linear-gradient(135deg, rgba(0,184,255,0.35), transparent 40%, rgba(255,159,26,0.18) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events:none; opacity:0.7;
+}
+.glass-card:hover{
+  transform: translateY(-3px) rotateX(1.5deg);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,184,255,0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+  border-color:rgba(0,184,255,0.4);
+}
+
+/* ==========================================================================
+   MAIN GRID STAGE
+   ========================================================================== */
+.grid-stage{
+  position:relative; z-index:3;
+  display:grid;
+  grid-template-columns: 1.15fr 0.95fr 1.35fr 0.95fr 1.15fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "constr hudL serv hudR pipe"
+    "constr cent cent cent pipe"
+    "constr trans ctrl tower pipe";
+  gap:16px;
+  padding:16px clamp(16px,3vw,40px) 30px;
+  max-width:1720px;
+  margin:0 auto;
+  min-height:calc(100vh - 64px);
+}
+
+.zone{ position:relative; min-width:0; }
+.zone-construction{ grid-area:constr; }
+.zone-hud-left{ grid-area:hudL; padding:16px 18px; }
+.zone-server{ grid-area:serv; display:flex; align-items:flex-start; justify-content:center; }
+.zone-hud-right{ grid-area:hudR; padding:16px 18px; }
+.zone-pipeline{ grid-area:pipe; }
+.zone-center{ grid-area:cent; display:flex; align-items:center; justify-content:center; }
+.zone-transformer{ grid-area:trans; }
+.zone-controlroom{ grid-area:ctrl; }
+.zone-tower{ grid-area:tower; }
+
+.zone-frame{
+  position:relative; height:100%; border-radius:var(--radius-lg);
+  background:linear-gradient(180deg, rgba(8,13,20,0.35), rgba(4,7,11,0.55));
+  border:1px solid rgba(0,184,255,0.1);
+  overflow:hidden;
+  min-height:520px;
+}
+.zone-hairline{
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  box-shadow: inset 0 0 40px rgba(0,184,255,0.06);
+}
+.zone-tag{
+  position:absolute; top:12px; left:12px; z-index:2;
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.08em;
+  color:var(--ink-dim); background:rgba(3,6,10,0.55); border:1px solid rgba(0,184,255,0.18);
+  padding:5px 10px; border-radius:20px; display:flex; align-items:center; gap:6px;
+}
+.zone-tag.right{ left:auto; right:12px; }
+.tag-dot{ width:6px; height:6px; border-radius:50%; }
+.tag-dot.amber{ background:var(--amber); box-shadow:0 0 6px var(--amber); animation:pulseDot 2s infinite; }
+.tag-dot.blue{ background:var(--neon-blue); box-shadow:0 0 6px var(--neon-blue); animation:pulseDot 2s infinite; }
+
+.scene{ width:100%; height:100%; display:block; }
+.zone-construction .scene, .zone-pipeline .scene{ position:absolute; inset:0; }
+
+@keyframes pulseDot{ 0%,100%{ opacity:1;} 50%{ opacity:0.35;} }
+
+/* ==========================================================================
+   HUD PANELS (left/right)
+   ========================================================================== */
+.hud-header{
+  font-family:var(--font-display); font-size:12px; letter-spacing:0.1em; color:var(--neon-blue);
+  display:flex; align-items:center; gap:8px; margin-bottom:14px; text-shadow:0 0 10px rgba(0,184,255,0.5);
+}
+.hud-icon{ font-size:14px; }
+.hud-row{ margin-bottom:11px; }
+.hud-label{ font-size:12px; color:var(--ink-dim); }
+.hud-value{ float:right; font-family:var(--font-mono); font-size:12px; color:var(--ink); }
+.hud-bar{ clear:both; height:5px; background:rgba(255,255,255,0.06); border-radius:4px; margin-top:5px; overflow:hidden; }
+.hud-bar-fill{ height:100%; width:0%; border-radius:4px; background:linear-gradient(90deg, var(--neon-blue), #6fe0ff); box-shadow:0 0 8px rgba(0,184,255,0.6); transition:width 0.9s cubic-bezier(.4,0,.2,1); }
+.hud-chart{ width:100%; height:44px; margin-top:6px; opacity:0.85; filter:drop-shadow(0 0 4px rgba(0,184,255,0.5)); }
+#hudChartLine{ animation:chartGlow 3s ease-in-out infinite; }
+@keyframes chartGlow{ 0%,100%{ opacity:0.7;} 50%{ opacity:1;} }
+
+.shield{ width:70px; height:78px; display:block; margin:4px auto 10px; filter:drop-shadow(0 0 10px rgba(0,255,136,0.45)); }
+.shield-path{ animation:shieldGlow 3s ease-in-out infinite; }
+@keyframes shieldGlow{ 0%,100%{ stroke-opacity:0.8; } 50%{ stroke-opacity:1; filter:brightness(1.3);} }
+.shield-check{ stroke-dasharray:60; stroke-dashoffset:0; }
+.health-status,.health-uptime{ display:flex; justify-content:space-between; font-size:12px; padding:4px 2px; }
+.status-label{ color:var(--ink-dim); }
+.status-value{ font-family:var(--font-mono); color:var(--green); letter-spacing:0.06em; }
+.status-value.blue{ color:var(--neon-blue); }
+.heartbeat{ width:100%; height:30px; margin-top:8px; filter:drop-shadow(0 0 5px rgba(0,255,136,0.5)); }
+.heartbeat polyline{ stroke-dasharray:400; animation:hbFlow 2.2s linear infinite; }
+@keyframes hbFlow{ 0%{ stroke-dashoffset:400;} 100%{ stroke-dashoffset:0;} }
+
+/* ==========================================================================
+   SERVER RACK
+   ========================================================================== */
+.scene-server{ width:100%; height:auto; max-width:520px; filter:drop-shadow(0 10px 26px rgba(0,0,0,0.5)); }
+.rack-glow{ filter:drop-shadow(0 0 14px rgba(0,184,255,0.35)); }
+.fan-blades{ transform-origin:center; animation:spin 3.2s linear infinite; }
+.fan-blades.rev{ animation-direction:reverse; animation-duration:4s; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.led-blink{ animation:ledBlink 1.8s ease-in-out infinite; }
+.led-blink.d1{ animation-delay:0.4s; }
+.led-blink.d2{ animation-delay:0.9s; }
+@keyframes ledBlink{ 0%,100%{ opacity:1;} 50%{ opacity:0.15;} }
+.rack-display{ }
+.rack-display-text{ fill:var(--neon-blue); font-family:var(--font-mono); font-size:9px; animation:textFlicker 4s infinite; }
+.rack-display-text.big{ font-size:11px; }
+.net-pulse{ animation:netTravel 2.4s linear infinite; }
+.np2{ animation-delay:1.1s; }
+@keyframes netTravel{ 0%{ transform:translateX(0); opacity:0;} 10%{opacity:1;} 90%{opacity:1;} 100%{ transform:translateX(50px); opacity:0;} }
+@keyframes textFlicker{ 0%,92%,100%{ opacity:1;} 94%{ opacity:0.3;} 96%{opacity:1;} }
+
+/* ==========================================================================
+   CENTER MAINTENANCE PANEL
+   ========================================================================== */
+.panel-main{
+  padding:clamp(24px,3vw,44px) clamp(20px,3vw,50px);
+  text-align:center; max-width:560px; width:100%;
+  animation: panelPulseBg 5s ease-in-out infinite;
+}
+@keyframes panelPulseBg{
+  0%,100%{ box-shadow:0 8px 32px rgba(0,0,0,0.45), 0 0 0 rgba(0,184,255,0); }
+  50%{ box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 46px rgba(0,184,255,0.16); }
+}
+
+.gear-row{ display:flex; align-items:center; justify-content:center; gap:2px; margin-bottom:6px; height:56px; }
+.gear{ color:var(--amber); filter:drop-shadow(0 0 8px rgba(255,159,26,0.5)); }
+.gear-l{ width:34px; height:34px; color:var(--neon-blue); filter:drop-shadow(0 0 8px rgba(0,184,255,0.5)); animation:gearSpin 6s linear infinite; margin-right:-6px; }
+.gear-m{ width:48px; height:48px; animation:gearSpin 4.5s linear infinite reverse; z-index:1; }
+.gear-r{ width:34px; height:34px; color:var(--neon-blue); filter:drop-shadow(0 0 8px rgba(0,184,255,0.5)); animation:gearSpin 6s linear infinite; margin-left:-6px; }
+@keyframes gearSpin{
+  0%{ transform:rotate(0deg); }
+  100%{ transform:rotate(360deg); }
+}
+
+.panel-title{ font-family:var(--font-display); margin:0 0 14px; line-height:1.15; font-weight:700; }
+.title-icon{ display:none; }
+.title-text{ font-size:clamp(28px,4vw,44px); color:var(--ink); letter-spacing:0.04em; text-shadow:0 0 18px rgba(255,255,255,0.15); }
+.title-text .accent{
+  color:var(--amber);
+  background:linear-gradient(90deg, var(--amber), #ffd88a, var(--amber));
+  background-size:200% auto;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  animation:titleShine 4s linear infinite;
+  text-shadow:none;
+  filter:drop-shadow(0 0 18px rgba(255,159,26,0.35));
+}
+@keyframes titleShine{ 0%{ background-position:0% center;} 100%{ background-position:200% center;} }
+
+.panel-sub{ color:var(--ink); font-size:16px; margin:0 0 4px; font-weight:500; }
+.panel-sub2{ color:var(--neon-blue); font-size:14px; margin:0 0 22px; font-weight:500; text-shadow:0 0 10px rgba(0,184,255,0.4); }
+
+.progress-wrap{ margin-bottom:26px; }
+.progress-track{
+  position:relative; height:14px; border-radius:8px; background:rgba(255,255,255,0.06);
+  overflow:hidden; border:1px solid rgba(0,184,255,0.2);
+}
+.progress-fill{
+  position:relative; height:100%; width:0%; border-radius:8px;
+  background:linear-gradient(90deg, #0077a6, var(--neon-blue), #6fe0ff);
+  box-shadow:0 0 14px rgba(0,184,255,0.7);
+  transition:width 0.1s linear;
+  overflow:hidden;
+}
+.progress-streak{
+  position:absolute; top:0; bottom:0; width:40px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+  animation:streakMove 1.4s linear infinite;
+}
+@keyframes streakMove{ 0%{ left:-40px;} 100%{ left:100%;} }
+.progress-meta{ display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:var(--ink-dim); }
+#progressPct{ color:var(--neon-blue); font-size:13px; }
+
+.feature-icons{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.feature-icon{
+  background:rgba(255,255,255,0.03); border:1px solid rgba(0,184,255,0.15); border-radius:var(--radius-md);
+  padding:12px 6px 10px; color:var(--ink-dim); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px;
+  font-family:var(--font-body); font-size:10.5px; letter-spacing:0.02em; transition:all 0.3s ease;
+}
+.feature-icon svg{ width:26px; height:26px; transition:transform 0.3s ease, color 0.3s ease; }
+.feature-icon:hover{ color:var(--amber); border-color:rgba(255,159,26,0.5); background:rgba(255,159,26,0.06); transform:translateY(-3px); box-shadow:0 8px 20px rgba(255,159,26,0.15); }
+.feature-icon:hover svg{ transform:scale(1.12); filter:drop-shadow(0 0 8px rgba(255,159,26,0.6)); }
+.feature-icon:nth-child(2):hover, .feature-icon:nth-child(3):hover{ color:var(--neon-blue); border-color:rgba(0,184,255,0.5); background:rgba(0,184,255,0.06); }
+.feature-icon:nth-child(2):hover svg, .feature-icon:nth-child(3):hover svg{ filter:drop-shadow(0 0 8px rgba(0,184,255,0.6)); }
+
+.panel-main.pulse-flash{ box-shadow:0 8px 40px rgba(0,0,0,0.5), 0 0 80px rgba(0,184,255,0.4) !important; }
+
+/* ==========================================================================
+   CONSTRUCTION SCENE ANIMATIONS
+   ========================================================================== */
+.crane-slew{ animation:craneRotate 22s linear infinite; transform-origin:0 0; }
+@keyframes craneRotate{ 0%{ transform:rotate(0deg);} 40%{ transform:rotate(35deg);} 60%{ transform:rotate(35deg);} 100%{ transform:rotate(0deg);} }
+.crane-trolley{ animation:trolleyMove 6s ease-in-out infinite; }
+@keyframes trolleyMove{ 0%,100%{ transform:translateX(60px);} 50%{ transform:translateX(180px);} }
+.crane-cable{ animation:hookMove 6s ease-in-out infinite; }
+.crane-hook{ animation:hookMoveG 6s ease-in-out infinite; }
+@keyframes hookMove{ 0%,100%{ y2:120;} 30%{ y2:170;} 60%{ y2:170;} 100%{ y2:120;} }
+@keyframes hookMoveG{ 0%,100%{ transform:translateY(120px);} 30%{ transform:translateY(170px);} 60%{ transform:translateY(170px);} 100%{ transform:translateY(120px);} }
+
+.excavator-arm{ animation:excArm 4.5s ease-in-out infinite; transform-origin:35px -25px; }
+.excavator-forearm{ animation:excForearm 4.5s ease-in-out infinite; transform-origin:80px -55px; }
+.excavator-bucket{ animation:excBucket 4.5s ease-in-out infinite; transform-origin:60px -15px; }
+@keyframes excArm{ 0%,100%{ transform:rotate(0deg);} 40%{ transform:rotate(-8deg);} 70%{ transform:rotate(10deg);} }
+@keyframes excForearm{ 0%,100%{ transform:rotate(0deg);} 40%{ transform:rotate(18deg);} 70%{ transform:rotate(-14deg);} }
+@keyframes excBucket{ 0%,100%{ transform:rotate(0deg);} 40%{ transform:rotate(-22deg);} 70%{ transform:rotate(20deg);} }
+
+.mixer-drum{ animation:mixerSpin 5s linear infinite; transform-origin:0 0; }
+@keyframes mixerSpin{ to{ transform:rotate(360deg); } }
+
+.worker-1 .leg-a{ animation:legA 1.1s ease-in-out infinite; transform-origin:0px -4px; }
+.worker-1 .leg-b{ animation:legB 1.1s ease-in-out infinite; transform-origin:0px -4px; }
+.worker-1 .arm-a{ animation:legB 1.1s ease-in-out infinite; transform-origin:0px -15px; }
+.worker-1 .arm-b{ animation:legA 1.1s ease-in-out infinite; transform-origin:0px -15px; }
+@keyframes legA{ 0%,100%{ transform:rotate(18deg);} 50%{ transform:rotate(-18deg);} }
+@keyframes legB{ 0%,100%{ transform:rotate(-18deg);} 50%{ transform:rotate(18deg);} }
+.worker-1{ animation:workerWalk 12s linear infinite; }
+@keyframes workerWalk{ 0%{ transform:translate(205px,565px);} 45%{ transform:translate(280px,565px);} 50%{ transform:translate(280px,565px) scaleX(-1);} 95%{ transform:translate(205px,565px) scaleX(-1);} 100%{ transform:translate(205px,565px);} }
+
+.weld-arm{ animation:weldArm 0.4s ease-in-out infinite alternate; transform-origin:0px -8px; }
+@keyframes weldArm{ 0%{ transform:rotate(-4deg);} 100%{ transform:rotate(4deg);} }
+.weld-spark{ animation:weldSpark 0.3s ease-in-out infinite alternate; }
+@keyframes weldSpark{ 0%{ opacity:0.2; r:1;} 100%{ opacity:1; r:2.4;} }
+
+.wl{ fill:#3a5570; animation:winLight 4s ease-in-out infinite; }
+.wl.d1{ animation-delay:1.3s; }
+.wl.d2{ animation-delay:2.6s; }
+@keyframes winLight{ 0%,60%,100%{ fill:#3a5570;} 70%,90%{ fill:#ffcf7a;} }
+
+.warn-light{ animation:warnBlink 1.2s ease-in-out infinite; filter:drop-shadow(0 0 4px #ff3b3b); }
+.w2{ animation-delay:0.6s; }
+@keyframes warnBlink{ 0%,100%{ opacity:1;} 50%{ opacity:0.1;} }
+
+/* ==========================================================================
+   PIPELINE SCENE ANIMATIONS
+   ========================================================================== */
+.pipe-flow{ animation:flowRight 2.4s linear infinite; }
+.pipe-flow.rev{ animation:flowLeft 2.4s linear infinite; }
+@keyframes flowRight{ 0%{ transform:translateX(-140px);} 100%{ transform:translateX(430px);} }
+@keyframes flowLeft{ 0%{ transform:translateX(140px);} 100%{ transform:translateX(-430px);} }
+.pipe-flow-v{ animation:flowV 2s linear infinite; }
+@keyframes flowV{ 0%{ transform:rotate(90deg) translateX(-70px);} 100%{ transform:rotate(90deg) translateX(70px);} }
+
+.valve{ animation:valveTurn 9s ease-in-out infinite; transform-origin:0 0; }
+@keyframes valveTurn{ 0%,70%{ transform:rotate(0deg);} 85%{ transform:rotate(120deg);} 100%{ transform:rotate(120deg);} }
+
+.gauge-needle{ animation:needleSway 4s ease-in-out infinite; transform-origin:0 0; }
+.gauge-needle.small{ animation-duration:3.2s; }
+.gauge-needle.small.rev{ animation-direction:reverse; }
+@keyframes needleSway{ 0%,100%{ transform:rotate(-35deg);} 50%{ transform:rotate(35deg);} }
+.gauge-label{ fill:var(--ink-dim); font-family:var(--font-mono); font-size:8px; text-anchor:middle; }
+
+.pipe-bot{ offset-path:path('M40,193 H440'); animation:botTravel 8s linear infinite; }
+@keyframes botTravel{ 0%{ offset-distance:0%;} 100%{ offset-distance:100%;} }
+
+.turbine-blades{ animation:spin 4s linear infinite; transform-origin:0 0; }
+.smoke{ fill:rgba(180,190,200,0.35); animation:smokeRise 5s ease-out infinite; }
+.smoke.s2{ animation-delay:1.6s; }
+.smoke.s3{ animation-delay:3.2s; }
+@keyframes smokeRise{ 0%{ transform:translateY(0) scale(0.6); opacity:0.5;} 100%{ transform:translateY(-60px) scale(1.6); opacity:0;} }
+
+.steam{ fill:rgba(180,220,255,0.3); animation:smokeRise 3s ease-out infinite; }
+.steam.s2{ animation-delay:1s; }
+.steam.s3{ animation-delay:2s; }
+
+.tank-fill{ animation:tankPulse 3s ease-in-out infinite; }
+@keyframes tankPulse{ 0%,100%{ opacity:0.6;} 50%{ opacity:1;} }
+
+.blink-slow{ animation:ledBlink 2.6s ease-in-out infinite; }
+.blink-slow.d1{ animation-delay:0.8s; }
+.status-text{ fill:var(--green); font-family:var(--font-mono); font-size:11px; }
+.status-text.small{ font-size:9px; fill:var(--ink-dim); }
+
+/* ==========================================================================
+   TRANSFORMER / CONTROL ROOM / TOWER
+   ========================================================================== */
+.cable-swing{ animation:cableSwing 4s ease-in-out infinite; transform-origin:110px 105px; }
+@keyframes cableSwing{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(2px);} }
+.danger-bolt{ fill:#1a1408; font-family:var(--font-display); font-size:14px; font-weight:900; }
+.danger-label{ fill:var(--ink-dim); font-family:var(--font-mono); font-size:8px; letter-spacing:0.08em; }
+.spark{ animation:sparkFlicker 0.8s ease-in-out infinite; filter:drop-shadow(0 0 4px #fff2c9); }
+.spark.d1{ animation-delay:0.3s; }
+.spark.d2{ animation-delay:0.55s; }
+@keyframes sparkFlicker{ 0%,100%{ opacity:0;} 50%{ opacity:1;} }
+.flicker-light circle{ animation:ledBlink 2.4s ease-in-out infinite; }
+
+.gauge-needle{ }
+.switch-toggle{ animation:switchFlip 5s ease-in-out infinite; }
+.switch-toggle.d1{ animation-delay:1.6s; }
+.switch-toggle.d2{ animation-delay:3.2s; }
+@keyframes switchFlip{ 0%,40%{ y:3;} 50%,90%{ y:13;} 100%{ y:3;} }
+
+.turbine{ }
+
+.win{ fill:#4a6a86; animation:winLight 6s ease-in-out infinite; }
+.win.d1{ animation-delay:2s; }
+.win.d2{ animation-delay:4s; }
+
+.power-pulse{ offset-path:path('M-30,50 Q60,20 200,50'); animation:powerTravel 3s linear infinite; filter:drop-shadow(0 0 5px var(--neon-blue)); }
+@keyframes powerTravel{ 0%{ offset-distance:0%; opacity:0;} 8%{opacity:1;} 92%{opacity:1;} 100%{ offset-distance:100%; opacity:0;} }
+
+/* ==========================================================================
+   FOOTER STRIP
+   ========================================================================== */
+.footer-strip{
+  position:relative; z-index:5;
+  margin:0 clamp(16px,3vw,40px) 24px;
+  padding:16px 20px;
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-around; gap:16px;
+  border-radius:var(--radius-lg);
+}
+.footer-item{
+  display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink-dim);
+  font-family:var(--font-body); letter-spacing:0.02em;
+}
+.footer-icon{ width:20px; height:20px; color:var(--neon-blue); animation:iconPulse 3.4s ease-in-out infinite; }
+.footer-item:nth-child(2) .footer-icon{ color:var(--green); animation-delay:0.6s; }
+.footer-item:nth-child(3) .footer-icon{ color:var(--amber); animation-delay:1.2s; }
+.footer-item:nth-child(4) .footer-icon{ color:var(--neon-blue); animation-delay:1.8s; }
+@keyframes iconPulse{ 0%,100%{ filter:drop-shadow(0 0 2px currentColor); opacity:0.85;} 50%{ filter:drop-shadow(0 0 8px currentColor); opacity:1;} }
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1200px){
+  .grid-stage{
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "hudL hudR"
+      "serv serv"
+      "cent cent"
+      "constr pipe"
+      "trans ctrl"
+      "tower tower";
+  }
+  .zone-frame{ min-height:420px; }
+}
+
+@media (max-width: 720px){
+  .grid-stage{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "cent"
+      "serv"
+      "hudL"
+      "hudR"
+      "constr"
+      "pipe"
+      "trans"
+      "ctrl"
+      "tower";
+    gap:14px; padding:14px 14px 24px;
+  }
+  .zone-frame{ min-height:340px; }
+  .title-text{ font-size:30px; }
+  .feature-icons{ grid-template-columns:repeat(2,1fr); }
+  .footer-strip{ justify-content:flex-start; }
+  .topbar{ flex-direction:column; align-items:flex-start; gap:6px; }
+}
