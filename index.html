@@ -1,38 +1,648 @@
-<!-- index.html (only the Infrastructure panel section shown; keep the rest of your page intact) -->
-<article id="infraPanel" class="panel panel--glass panel--infra" aria-labelledby="infra-title" tabindex="0" data-panel="infrastructure">
-  <h2 id="infra-title" class="panel-title">Server & Pipeline Infrastructure</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>System Under Maintenance — Infrastructure Upgrade in Progress</title>
+<meta name="description" content="Our platform is undergoing a scheduled infrastructure upgrade. Construction, server, pipeline and electrical systems are all being modernized.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-  <div class="scene scene--infra" id="infraScene" role="img" aria-label="Server room and pipelines">
-    <!-- Server racks (SVG) -->
-    <svg id="infraRacksSVG" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet" class="infra-svg" aria-hidden="true">
-      <defs>
-        <linearGradient id="rackGrad" x1="0" x2="1">
-          <stop offset="0" stop-color="#071226"/>
-          <stop offset="1" stop-color="#0f1724"/>
-        </linearGradient>
-        <filter id="ledGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="6" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
+<!-- ============================================================
+     BACKGROUND LAYERS — parallax sky, fog, particles, light rays
+     ============================================================ -->
+<div class="bg-layers" aria-hidden="true">
+  <div class="bg-sky"></div>
+  <div class="bg-city"></div>
+  <div class="bg-rays"></div>
+  <canvas id="particleCanvas"></canvas>
+  <div class="bg-fog fog-1"></div>
+  <div class="bg-fog fog-2"></div>
+  <div class="scan-grid"></div>
+  <div class="vignette"></div>
+</div>
 
-      <!-- three racks -->
-      <g id="racks" transform="translate(40,40)"></g>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 
-      <!-- circuit lines layer -->
-      <g id="circuitLines" transform="translate(0,0)"></g>
-
-      <!-- packet layer (SVG group for crisp glow) -->
-      <g id="packets" transform="translate(0,0)"></g>
+<!-- ============================================================
+     TOP BAR
+     ============================================================ -->
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 40 40" width="26" height="26">
+      <polygon points="20,3 35,12 35,28 20,37 5,28 5,12" fill="none" stroke="var(--neon-blue)" stroke-width="2"/>
+      <circle cx="20" cy="20" r="6" fill="var(--neon-blue)" class="brand-pulse"/>
     </svg>
-
-    <!-- Binary streams container (DOM-based for text rendering & neon glow) -->
-    <div id="binaryStreams" class="binary-streams" aria-hidden="true"></div>
-
-    <!-- Floating labels -->
-    <div id="infraLabels" class="infra-labels" aria-hidden="true"></div>
-
-    <!-- Overlay for subtle vignette and glow -->
-    <div class="infra-overlay" aria-hidden="true"></div>
+    <span>APEX&nbsp;<strong>OPS</strong></span>
   </div>
-</article>
+  <div class="topbar-status">
+    <span class="dot dot-live"></span>
+    <span class="mono">LIVE OPERATIONS CENTER</span>
+    <span class="divider">|</span>
+    <span class="mono" id="clock">00:00:00 UTC</span>
+  </div>
+</header>
+
+<!-- ============================================================
+     MAIN GRID — matches reference composition
+     ============================================================ -->
+<main class="grid-stage">
+
+  <!-- LEFT: Construction Site -->
+  <section class="zone zone-construction" aria-label="Construction site status">
+    <div class="zone-frame">
+      <div class="zone-tag"><span class="tag-dot amber"></span>CONSTRUCTION SITE — SECTOR A</div>
+      <svg class="scene" viewBox="0 0 520 620" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a1408"/>
+            <stop offset="100%" stop-color="#0a0704"/>
+          </linearGradient>
+          <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ff9f1a"/>
+            <stop offset="100%" stop-color="#c96f00"/>
+          </linearGradient>
+        </defs>
+
+        <!-- half-built building -->
+        <g class="building">
+          <rect x="20" y="220" width="150" height="330" fill="#0d1420" stroke="#274058" stroke-width="2"/>
+          <g class="floor-lines" stroke="#26374c" stroke-width="1.4">
+            <line x1="20" y1="270" x2="170" y2="270"/>
+            <line x1="20" y1="330" x2="170" y2="330"/>
+            <line x1="20" y1="390" x2="170" y2="390"/>
+            <line x1="20" y1="450" x2="170" y2="450"/>
+            <line x1="20" y1="510" x2="170" y2="510"/>
+          </g>
+          <g class="win-lights">
+            <rect x="32" y="245" width="14" height="16" class="wl"/>
+            <rect x="60" y="245" width="14" height="16" class="wl d1"/>
+            <rect x="88" y="300" width="14" height="16" class="wl d2"/>
+            <rect x="120" y="360" width="14" height="16" class="wl"/>
+            <rect x="40" y="420" width="14" height="16" class="wl d1"/>
+            <rect x="100" y="470" width="14" height="16" class="wl d2"/>
+          </g>
+          <!-- rebar / steel rods on top -->
+          <g stroke="#8a6b3c" stroke-width="2">
+            <line x1="30" y1="220" x2="30" y2="185"/>
+            <line x1="45" y1="220" x2="45" y2="180"/>
+            <line x1="60" y1="220" x2="60" y2="190"/>
+            <line x1="150" y1="220" x2="150" y2="182"/>
+            <line x1="135" y1="220" x2="135" y2="192"/>
+          </g>
+          <!-- scaffolding -->
+          <g class="scaffold" stroke="#5a6472" stroke-width="2" fill="none">
+            <line x1="182" y1="230" x2="182" y2="550"/>
+            <line x1="222" y1="230" x2="222" y2="550"/>
+            <line x1="182" y1="260" x2="222" y2="260"/>
+            <line x1="182" y1="320" x2="222" y2="320"/>
+            <line x1="182" y1="380" x2="222" y2="380"/>
+            <line x1="182" y1="440" x2="222" y2="440"/>
+            <line x1="182" y1="500" x2="222" y2="500"/>
+            <line x1="182" y1="260" x2="222" y2="320"/>
+            <line x1="222" y1="260" x2="182" y2="320"/>
+            <line x1="182" y1="380" x2="222" y2="440"/>
+            <line x1="222" y1="380" x2="182" y2="440"/>
+          </g>
+        </g>
+
+        <!-- tower crane -->
+        <g class="crane" transform="translate(300,0)">
+          <rect x="296" y="130" width="8" height="420" fill="#3a3f47"/>
+          <g class="crane-lattice" stroke="#565c66" stroke-width="1.5">
+            <line x1="296" y1="150" x2="304" y2="170"/>
+            <line x1="304" y1="150" x2="296" y2="170"/>
+            <line x1="296" y1="190" x2="304" y2="210"/>
+            <line x1="304" y1="190" x2="296" y2="210"/>
+            <line x1="296" y1="230" x2="304" y2="250"/>
+            <line x1="304" y1="230" x2="296" y2="250"/>
+            <line x1="296" y1="270" x2="304" y2="290"/>
+            <line x1="304" y1="270" x2="296" y2="290"/>
+            <line x1="296" y1="310" x2="304" y2="330"/>
+            <line x1="304" y1="310" x2="296" y2="330"/>
+            <line x1="296" y1="350" x2="304" y2="370"/>
+            <line x1="304" y1="350" x2="296" y2="370"/>
+          </g>
+          <g transform="translate(300,130)">
+          <g class="crane-slew">
+            <rect x="-6" y="-14" width="12" height="14" fill="#ff9f1a"/>
+            <!-- jib (long arm, rotates) -->
+            <g class="crane-jib">
+              <line x1="-190" y1="0" x2="220" y2="0" stroke="#ff9f1a" stroke-width="6"/>
+              <line x1="0" y1="-46" x2="220" y2="0" stroke="#c96f00" stroke-width="3"/>
+              <line x1="0" y1="-46" x2="-190" y2="0" stroke="#c96f00" stroke-width="3"/>
+              <line x1="0" y1="-46" x2="0" y2="0" stroke="#c96f00" stroke-width="3"/>
+              <g class="lattice-jib" stroke="#8a5a10" stroke-width="1.5">
+                <line x1="-30" y1="0" x2="-20" y2="-14"/>
+                <line x1="30" y1="0" x2="20" y2="-14"/>
+                <line x1="80" y1="0" x2="70" y2="-14"/>
+                <line x1="130" y1="0" x2="120" y2="-14"/>
+                <line x1="180" y1="0" x2="170" y2="-14"/>
+                <line x1="-80" y1="0" x2="-70" y2="-14"/>
+                <line x1="-130" y1="0" x2="-120" y2="-14"/>
+              </g>
+              <!-- counterweight -->
+              <rect x="-190" y="0" width="34" height="26" fill="#2c2f36"/>
+              <!-- trolley (moves along jib) -->
+              <g class="crane-trolley" transform="translate(60,0)">
+                <rect x="-9" y="0" width="18" height="10" fill="#ffb24d"/>
+                <line class="crane-cable" x1="0" y1="10" x2="0" y2="120" stroke="#9aa0a8" stroke-width="1.5"/>
+                <g class="crane-hook" transform="translate(0,120)">
+                  <rect x="-24" y="-6" width="48" height="10" fill="#ff9f1a"/>
+                  <path d="M0,4 v14 q0,10 10,10" fill="none" stroke="#ffb24d" stroke-width="4"/>
+                </g>
+              </g>
+            </g>
+            <!-- cab -->
+            <rect x="-8" y="-12" width="16" height="16" fill="#1a1d22" stroke="#ff9f1a" stroke-width="1"/>
+          </g>
+          </g>
+        </g>
+
+        <!-- excavator -->
+        <g class="excavator" transform="translate(230,530)">
+          <rect x="-40" y="-2" width="90" height="24" rx="4" fill="#e0a51a"/>
+          <circle cx="-25" cy="24" r="12" fill="#25272b"/>
+          <circle cx="20" cy="24" r="12" fill="#25272b"/>
+          <rect x="-15" y="-40" width="60" height="40" rx="6" fill="#f0b429"/>
+          <rect x="-8" y="-34" width="26" height="20" rx="2" fill="#8fd9ff" opacity="0.5"/>
+          <g class="excavator-arm">
+            <line x1="35" y1="-25" x2="80" y2="-55" stroke="#e0a51a" stroke-width="9" stroke-linecap="round"/>
+            <g class="excavator-forearm">
+              <line x1="80" y1="-55" x2="60" y2="-15" stroke="#e0a51a" stroke-width="7" stroke-linecap="round"/>
+              <g class="excavator-bucket">
+                <path d="M60,-15 q22,4 22,22 q-14,6 -30,-2 z" fill="#c98b12"/>
+              </g>
+            </g>
+          </g>
+        </g>
+
+        <!-- cement mixer truck -->
+        <g class="mixer-truck" transform="translate(360,545)">
+          <rect x="-10" y="-10" width="60" height="26" rx="3" fill="#d64545"/>
+          <rect x="-30" y="-2" width="24" height="18" rx="2" fill="#b23a3a"/>
+          <rect x="-26" y="-14" width="16" height="14" fill="#8fd9ff" opacity="0.5"/>
+          <g class="mixer-drum-group" transform="translate(20,-14)">
+            <ellipse cx="0" cy="0" rx="17" ry="17" fill="#909aa4"/>
+            <g class="mixer-drum" >
+              <path d="M-14,-6 A16,16 0 0 1 14,-6" fill="none" stroke="#5c646d" stroke-width="3"/>
+              <line x1="0" y1="-16" x2="0" y2="16" stroke="#5c646d" stroke-width="2"/>
+              <line x1="-14" y1="-8" x2="14" y2="8" stroke="#5c646d" stroke-width="2"/>
+              <line x1="14" y1="-8" x2="-14" y2="8" stroke="#5c646d" stroke-width="2"/>
+            </g>
+          </g>
+          <circle cx="-16" cy="20" r="8" fill="#111316"/>
+          <circle cx="5" cy="20" r="8" fill="#111316"/>
+          <circle cx="35" cy="20" r="8" fill="#111316"/>
+        </g>
+
+        <!-- workers -->
+        <g class="worker worker-1" transform="translate(205,565)">
+          <circle cx="0" cy="-24" r="5" fill="#ff9f1a"/>
+          <line x1="0" y1="-19" x2="0" y2="-4" stroke="#dbe4ee" stroke-width="3"/>
+          <line class="leg-a" x1="0" y1="-4" x2="-5" y2="8" stroke="#2c3542" stroke-width="3"/>
+          <line class="leg-b" x1="0" y1="-4" x2="5" y2="8" stroke="#2c3542" stroke-width="3"/>
+          <line class="arm-a" x1="0" y1="-15" x2="-8" y2="-6" stroke="#dbe4ee" stroke-width="2.5"/>
+          <line class="arm-b" x1="0" y1="-15" x2="8" y2="-6" stroke="#dbe4ee" stroke-width="2.5"/>
+        </g>
+        <g class="worker worker-2" transform="translate(120,255)">
+          <circle cx="0" cy="-16" r="4" fill="#ff9f1a"/>
+          <line x1="0" y1="-12" x2="0" y2="0" stroke="#dbe4ee" stroke-width="2.5"/>
+          <line x1="0" y1="0" x2="-4" y2="10" stroke="#2c3542" stroke-width="2.5"/>
+          <line x1="0" y1="0" x2="4" y2="10" stroke="#2c3542" stroke-width="2.5"/>
+          <line class="weld-arm" x1="0" y1="-8" x2="10" y2="-2" stroke="#dbe4ee" stroke-width="2"/>
+          <circle class="weld-spark" cx="12" cy="-1" r="1.6" fill="#fff2c9"/>
+        </g>
+
+        <!-- warning lights -->
+        <circle class="warn-light w1" cx="18" cy="222" r="3" fill="#ff3b3b"/>
+        <circle class="warn-light w2" cx="470" cy="140" r="3" fill="#ff3b3b"/>
+      </svg>
+      <div class="zone-hairline"></div>
+    </div>
+  </section>
+
+  <!-- TOP LEFT HUD -->
+  <aside class="zone zone-hud-left glass-card" aria-label="Server status telemetry">
+    <div class="hud-header"><span class="hud-icon">◧</span>SERVER STATUS</div>
+    <div class="hud-row" data-metric="cpu">
+      <span class="hud-label">CPU Usage</span><span class="hud-value">—%</span>
+      <div class="hud-bar"><div class="hud-bar-fill"></div></div>
+    </div>
+    <div class="hud-row" data-metric="mem">
+      <span class="hud-label">Memory</span><span class="hud-value">—%</span>
+      <div class="hud-bar"><div class="hud-bar-fill"></div></div>
+    </div>
+    <div class="hud-row" data-metric="storage">
+      <span class="hud-label">Storage</span><span class="hud-value">—%</span>
+      <div class="hud-bar"><div class="hud-bar-fill"></div></div>
+    </div>
+    <div class="hud-row" data-metric="net">
+      <span class="hud-label">Network</span><span class="hud-value">—%</span>
+      <div class="hud-bar"><div class="hud-bar-fill"></div></div>
+    </div>
+    <svg class="hud-chart" viewBox="0 0 220 50" preserveAspectRatio="none">
+      <polyline id="hudChartLine" points="0,40 20,32 40,36 60,20 80,28 100,15 120,24 140,10 160,18 180,8 200,14 220,6" fill="none" stroke="var(--neon-blue)" stroke-width="2"/>
+    </svg>
+  </aside>
+
+  <!-- TOP CENTER: Server rack -->
+  <section class="zone zone-server" aria-label="Server rack">
+    <svg class="scene scene-server" viewBox="0 0 460 260" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="rackGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#151b24"/>
+          <stop offset="100%" stop-color="#0a0d12"/>
+        </linearGradient>
+      </defs>
+      <!-- network pulses traveling between cabinets -->
+      <line x1="150" y1="130" x2="200" y2="130" stroke="#0d3a52" stroke-width="2"/>
+      <line x1="260" y1="130" x2="310" y2="130" stroke="#0d3a52" stroke-width="2"/>
+      <circle class="net-pulse np1" cx="150" cy="130" r="3" fill="var(--neon-blue)"/>
+      <circle class="net-pulse np2" cx="260" cy="130" r="3" fill="var(--neon-blue)"/>
+
+      <!-- left cabinet -->
+      <g transform="translate(60,20)">
+        <rect width="90" height="220" rx="6" fill="url(#rackGrad)" stroke="#213043" stroke-width="2"/>
+        <g class="fan fan-a" transform="translate(45,40)"><circle r="16" fill="none" stroke="#2a3d52" stroke-width="2"/><g class="fan-blades"><path d="M0,0 L0,-14 A14,14 0 0 1 12,-6 Z" fill="#173047"/><path d="M0,0 L12,-6 A14,14 0 0 1 12,6 Z" fill="#173047"/><path d="M0,0 L12,6 A14,14 0 0 1 0,14 Z" fill="#173047"/><path d="M0,0 L0,14 A14,14 0 0 1 -12,6 Z" fill="#173047"/><path d="M0,0 L-12,6 A14,14 0 0 1 -12,-6 Z" fill="#173047"/><path d="M0,0 L-12,-6 A14,14 0 0 1 0,-14 Z" fill="#173047"/></g></g>
+        <g class="rack-slot" transform="translate(15,72)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink" cx="6" cy="5" r="1.6" fill="#00ff88"/></g>
+        <g class="rack-slot" transform="translate(15,86)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d1" cx="6" cy="5" r="1.6" fill="var(--neon-blue)"/></g>
+        <g class="rack-slot" transform="translate(15,100)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d2" cx="6" cy="5" r="1.6" fill="#00ff88"/></g>
+        <rect class="rack-display" x="15" y="120" width="60" height="26" fill="#031018" stroke="#0d3a52"/>
+        <text class="rack-display-text" x="45" y="137" text-anchor="middle">OK</text>
+        <g class="rack-slot" transform="translate(15,156)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d1" cx="6" cy="5" r="1.6" fill="#ff9f1a"/></g>
+        <g class="rack-slot" transform="translate(15,170)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink" cx="6" cy="5" r="1.6" fill="var(--neon-blue)"/></g>
+        <g class="rack-slot" transform="translate(15,184)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d2" cx="6" cy="5" r="1.6" fill="#00ff88"/></g>
+      </g>
+
+      <!-- center cabinet (largest) -->
+      <g transform="translate(175,4)">
+        <rect width="110" height="252" rx="6" fill="url(#rackGrad)" stroke="var(--neon-blue)" stroke-width="2" class="rack-glow"/>
+        <g class="fan fan-b" transform="translate(30,34)"><circle r="14" fill="none" stroke="#2a3d52" stroke-width="2"/><g class="fan-blades"><path d="M0,0 L0,-12 A12,12 0 0 1 10,-5 Z" fill="#173047"/><path d="M0,0 L10,-5 A12,12 0 0 1 10,5 Z" fill="#173047"/><path d="M0,0 L10,5 A12,12 0 0 1 0,12 Z" fill="#173047"/><path d="M0,0 L0,12 A12,12 0 0 1 -10,5 Z" fill="#173047"/><path d="M0,0 L-10,5 A12,12 0 0 1 -10,-5 Z" fill="#173047"/><path d="M0,0 L-10,-5 A12,12 0 0 1 0,-12 Z" fill="#173047"/></g></g>
+        <g class="fan fan-c" transform="translate(80,34)"><circle r="14" fill="none" stroke="#2a3d52" stroke-width="2"/><g class="fan-blades rev"><path d="M0,0 L0,-12 A12,12 0 0 1 10,-5 Z" fill="#173047"/><path d="M0,0 L10,-5 A12,12 0 0 1 10,5 Z" fill="#173047"/><path d="M0,0 L10,5 A12,12 0 0 1 0,12 Z" fill="#173047"/><path d="M0,0 L0,12 A12,12 0 0 1 -10,5 Z" fill="#173047"/><path d="M0,0 L-10,5 A12,12 0 0 1 -10,-5 Z" fill="#173047"/><path d="M0,0 L-10,-5 A12,12 0 0 1 0,-12 Z" fill="#173047"/></g></g>
+        <rect class="rack-display" x="15" y="60" width="80" height="34" fill="#031018" stroke="var(--neon-blue)"/>
+        <text class="rack-display-text big" id="rackMainText" x="55" y="82" text-anchor="middle">SYNCING…</text>
+        <g id="rackLeds" transform="translate(15,104)">
+          <!-- LED grid injected/animated via CSS -->
+        </g>
+        <template id="ledRowTemplate"></template>
+        <g class="led-grid">
+          <circle class="led-blink" cx="20" cy="108" r="2" fill="#00ff88"/>
+          <circle class="led-blink d1" cx="30" cy="108" r="2" fill="var(--neon-blue)"/>
+          <circle class="led-blink d2" cx="40" cy="108" r="2" fill="#ff9f1a"/>
+          <circle class="led-blink" cx="50" cy="108" r="2" fill="#00ff88"/>
+          <circle class="led-blink d1" cx="60" cy="108" r="2" fill="var(--neon-blue)"/>
+          <circle class="led-blink d2" cx="70" cy="108" r="2" fill="#00ff88"/>
+          <circle class="led-blink" cx="80" cy="108" r="2" fill="#ff9f1a"/>
+          <circle class="led-blink d1" cx="20" cy="118" r="2" fill="var(--neon-blue)"/>
+          <circle class="led-blink d2" cx="30" cy="118" r="2" fill="#00ff88"/>
+          <circle class="led-blink" cx="40" cy="118" r="2" fill="#ff9f1a"/>
+          <circle class="led-blink d1" cx="50" cy="118" r="2" fill="var(--neon-blue)"/>
+          <circle class="led-blink d2" cx="60" cy="118" r="2" fill="#00ff88"/>
+          <circle class="led-blink" cx="70" cy="118" r="2" fill="var(--neon-blue)"/>
+          <circle class="led-blink d1" cx="80" cy="118" r="2" fill="#ff9f1a"/>
+        </g>
+        <g transform="translate(15,140)" stroke="#1c2c3d" stroke-width="1">
+          <line x1="0" y1="0" x2="80" y2="0"/><line x1="0" y1="10" x2="80" y2="10"/>
+          <line x1="0" y1="20" x2="80" y2="20"/><line x1="0" y1="30" x2="80" y2="30"/>
+          <line x1="0" y1="40" x2="80" y2="40"/><line x1="0" y1="50" x2="80" y2="50"/>
+          <line x1="0" y1="60" x2="80" y2="60"/>
+        </g>
+      </g>
+
+      <!-- right cabinet -->
+      <g transform="translate(320,20)">
+        <rect width="90" height="220" rx="6" fill="url(#rackGrad)" stroke="#213043" stroke-width="2"/>
+        <g class="fan fan-d" transform="translate(45,40)"><circle r="16" fill="none" stroke="#2a3d52" stroke-width="2"/><g class="fan-blades rev"><path d="M0,0 L0,-14 A14,14 0 0 1 12,-6 Z" fill="#173047"/><path d="M0,0 L12,-6 A14,14 0 0 1 12,6 Z" fill="#173047"/><path d="M0,0 L12,6 A14,14 0 0 1 0,14 Z" fill="#173047"/><path d="M0,0 L0,14 A14,14 0 0 1 -12,6 Z" fill="#173047"/><path d="M0,0 L-12,6 A14,14 0 0 1 -12,-6 Z" fill="#173047"/><path d="M0,0 L-12,-6 A14,14 0 0 1 0,-14 Z" fill="#173047"/></g></g>
+        <g class="rack-slot" transform="translate(15,72)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d1" cx="6" cy="5" r="1.6" fill="#00ff88"/></g>
+        <g class="rack-slot" transform="translate(15,86)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink" cx="6" cy="5" r="1.6" fill="var(--neon-blue)"/></g>
+        <g class="rack-slot" transform="translate(15,100)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d2" cx="6" cy="5" r="1.6" fill="#ff9f1a"/></g>
+        <rect class="rack-display" x="15" y="120" width="60" height="26" fill="#031018" stroke="#0d3a52"/>
+        <text class="rack-display-text" x="45" y="137" text-anchor="middle">OK</text>
+        <g class="rack-slot" transform="translate(15,156)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink" cx="6" cy="5" r="1.6" fill="var(--neon-blue)"/></g>
+        <g class="rack-slot" transform="translate(15,170)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d1" cx="6" cy="5" r="1.6" fill="#00ff88"/></g>
+        <g class="rack-slot" transform="translate(15,184)"><rect width="60" height="10" fill="#0f1620"/><circle class="led-blink d2" cx="6" cy="5" r="1.6" fill="var(--neon-blue)"/></g>
+      </g>
+    </svg>
+  </section>
+
+  <!-- TOP RIGHT HUD -->
+  <aside class="zone zone-hud-right glass-card" aria-label="System health status">
+    <div class="hud-header"><span class="hud-icon">◈</span>SYSTEM HEALTH</div>
+    <svg class="shield" viewBox="0 0 80 90">
+      <path class="shield-path" d="M40,4 L74,16 V44 C74,66 58,80 40,88 C22,80 6,66 6,44 V16 Z" fill="rgba(0,255,136,0.06)" stroke="#00ff88" stroke-width="2.5"/>
+      <path class="shield-check" d="M24,44 L35,55 L58,30" fill="none" stroke="#00ff88" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="health-status">
+      <span class="status-label">Status</span>
+      <span class="status-value">SECURE</span>
+    </div>
+    <div class="health-uptime">
+      <span class="status-label">Uptime</span>
+      <span class="status-value blue">99.9%</span>
+    </div>
+    <svg class="heartbeat" viewBox="0 0 220 40" preserveAspectRatio="none">
+      <polyline points="0,20 30,20 40,6 50,34 60,20 80,20 90,12 100,28 110,20 220,20" fill="none" stroke="#00ff88" stroke-width="2"/>
+    </svg>
+  </aside>
+
+  <!-- CENTER: main maintenance panel -->
+  <section class="zone zone-center" aria-label="Maintenance status">
+    <div class="glass-card panel-main">
+      <div class="gear-row" aria-hidden="true">
+        <svg class="gear gear-l" viewBox="0 0 60 60"><use href="#gearShape"/></svg>
+        <svg class="gear gear-m" viewBox="0 0 60 60"><use href="#gearShape"/></svg>
+        <svg class="gear gear-r" viewBox="0 0 60 60"><use href="#gearShape"/></svg>
+      </div>
+
+      <h1 class="panel-title">
+        <span class="title-icon">⚙</span>
+        <span class="title-text">UNDER<br><span class="accent">MAINTENANCE</span></span>
+      </h1>
+
+      <p class="panel-sub">We're upgrading our infrastructure.</p>
+      <p class="panel-sub2">We'll be back online shortly.</p>
+
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill">
+            <span class="progress-streak"></span>
+          </div>
+        </div>
+        <div class="progress-meta">
+          <span class="mono" id="progressPct">0%</span>
+          <span class="mono progress-eta" id="progressEta">EST. COMPLETE</span>
+        </div>
+      </div>
+
+      <div class="feature-icons">
+        <button class="feature-icon" data-tip="Construction Work">
+          <svg viewBox="0 0 40 40"><path d="M6,34 L16,14 L20,22 L24,10 L34,34 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <span>Construction Work</span>
+        </button>
+        <button class="feature-icon" data-tip="Server Management">
+          <svg viewBox="0 0 40 40"><rect x="8" y="6" width="24" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="18" width="24" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="13" cy="11" r="1.4" fill="currentColor"/><circle cx="13" cy="23" r="1.4" fill="currentColor"/></svg>
+          <span>Server Management</span>
+        </button>
+        <button class="feature-icon" data-tip="Pipeline Management">
+          <svg viewBox="0 0 40 40"><path d="M6,14 H18 V26 H34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="14" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <span>Pipeline Management</span>
+        </button>
+        <button class="feature-icon" data-tip="Electrical Management">
+          <svg viewBox="0 0 40 40"><path d="M22,4 L10,22 H18 L14,36 L30,16 H21 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <span>Electrical Management</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: pipeline + factory -->
+  <section class="zone zone-pipeline" aria-label="Pipeline system status">
+    <div class="zone-frame">
+      <div class="zone-tag right"><span class="tag-dot blue"></span>PIPELINE NETWORK — SECTOR B</div>
+      <svg class="scene" viewBox="0 0 480 620" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(0,184,255,0)"/>
+            <stop offset="50%" stop-color="rgba(0,184,255,0.95)"/>
+            <stop offset="100%" stop-color="rgba(0,184,255,0)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- factory skyline -->
+        <g class="factory" opacity="0.9">
+          <rect x="300" y="60" width="16" height="120" fill="#141c26"/>
+          <rect x="330" y="30" width="16" height="150" fill="#141c26"/>
+          <circle cx="308" cy="55" r="4" fill="#ff9f1a" class="blink-slow"/>
+          <circle cx="338" cy="25" r="4" fill="#ff3b3b" class="blink-slow d1"/>
+          <ellipse cx="270" cy="80" rx="28" ry="22" fill="#101820" stroke="#223"/>
+          <g class="turbine" transform="translate(390,90)">
+            <line x1="0" y1="0" x2="0" y2="70" stroke="#3a4552" stroke-width="4"/>
+            <g class="turbine-blades">
+              <line x1="0" y1="0" x2="0" y2="-30" stroke="#c8d4de" stroke-width="3"/>
+              <line x1="0" y1="0" x2="26" y2="15" stroke="#c8d4de" stroke-width="3"/>
+              <line x1="0" y1="0" x2="-26" y2="15" stroke="#c8d4de" stroke-width="3"/>
+            </g>
+          </g>
+          <g class="smoke-stack">
+            <rect x="255" y="70" width="10" height="40" fill="#1a2230"/>
+            <circle class="smoke s1" cx="260" cy="66" r="5"/>
+            <circle class="smoke s2" cx="260" cy="66" r="5"/>
+            <circle class="smoke s3" cx="260" cy="66" r="5"/>
+          </g>
+        </g>
+
+        <!-- storage tanks -->
+        <g transform="translate(30,410)">
+          <rect width="70" height="90" rx="8" fill="#101820" stroke="#26415a" stroke-width="2"/>
+          <rect x="6" y="76" width="58" height="8" fill="#0d3a52" class="tank-fill"/>
+          <circle cx="35" cy="8" r="3" fill="#00ff88" class="blink-slow"/>
+        </g>
+
+        <!-- large pipe run -->
+        <g class="pipes">
+          <rect x="10" y="180" width="440" height="26" rx="13" fill="#12181f" stroke="#2a3946" stroke-width="2"/>
+          <rect x="16" y="186" width="428" height="14" rx="7" fill="#050a10"/>
+          <rect class="pipe-flow" x="16" y="188" width="120" height="10" rx="5" fill="url(#flowGrad)"/>
+
+          <rect x="60" y="230" width="26" height="150" rx="13" fill="#12181f" stroke="#2a3946" stroke-width="2"/>
+          <rect x="66" y="236" width="14" height="138" rx="7" fill="#050a10"/>
+          <rect class="pipe-flow-v" x="68" y="236" width="10" height="60" rx="5" fill="url(#flowGrad)" transform="rotate(90 73 266)"/>
+
+          <rect x="10" y="330" width="440" height="26" rx="13" fill="#12181f" stroke="#2a3946" stroke-width="2"/>
+          <rect x="16" y="336" width="428" height="14" rx="7" fill="#050a10"/>
+          <rect class="pipe-flow rev" x="300" y="338" width="120" height="10" rx="5" fill="url(#flowGrad)"/>
+
+          <!-- valve wheel -->
+          <g transform="translate(380,193)">
+          <g class="valve">
+            <circle r="20" fill="none" stroke="#ff9f1a" stroke-width="3"/>
+            <line x1="-20" y1="0" x2="20" y2="0" stroke="#ff9f1a" stroke-width="3"/>
+            <line x1="0" y1="-20" x2="0" y2="20" stroke="#ff9f1a" stroke-width="3"/>
+            <line x1="-14" y1="-14" x2="14" y2="14" stroke="#ff9f1a" stroke-width="3"/>
+            <line x1="14" y1="-14" x2="-14" y2="14" stroke="#ff9f1a" stroke-width="3"/>
+          </g>
+          </g>
+
+          <!-- pressure gauge -->
+          <g transform="translate(150,270)">
+            <circle r="34" fill="#0a1119" stroke="var(--neon-blue)" stroke-width="2"/>
+            <text y="20" text-anchor="middle" class="gauge-label">BAR</text>
+            <g class="gauge-needle"><line x1="0" y1="0" x2="0" y2="-24" stroke="#ff5a3c" stroke-width="2.5"/></g>
+            <circle r="3" fill="#ff5a3c"/>
+          </g>
+
+          <!-- inspection drone / bot -->
+          <g class="pipe-bot">
+            <rect x="-14" y="-8" width="28" height="16" rx="4" fill="#1d2733" stroke="var(--neon-blue)" stroke-width="1.4"/>
+            <circle cx="-6" cy="0" r="2" fill="var(--neon-blue)"/>
+            <circle cx="6" cy="0" r="2" fill="var(--neon-blue)"/>
+          </g>
+        </g>
+
+        <!-- status indicator -->
+        <g transform="translate(370,300)">
+          <circle r="5" fill="#00ff88" class="blink-slow"/>
+          <text x="14" y="4" class="status-text">NORMAL</text>
+        </g>
+
+        <!-- steam -->
+        <g class="steam-vent" transform="translate(120,356)">
+          <circle class="steam s1" r="4"/>
+          <circle class="steam s2" r="4"/>
+          <circle class="steam s3" r="4"/>
+        </g>
+      </svg>
+      <div class="zone-hairline"></div>
+    </div>
+  </section>
+
+  <!-- BOTTOM LEFT: transformer -->
+  <section class="zone zone-transformer" aria-label="High voltage transformer status">
+    <svg class="scene" viewBox="0 0 260 200" preserveAspectRatio="xMidYMax meet">
+      <rect x="20" y="60" width="90" height="120" rx="4" fill="#12161c" stroke="#2a3946" stroke-width="2"/>
+      <g class="cable-swing" stroke="#ff9f1a" stroke-width="2" fill="none">
+        <path d="M110,90 Q135,100 150,90"/>
+        <path d="M110,120 Q135,130 150,120"/>
+      </g>
+      <g transform="translate(140,55)">
+        <polygon points="14,0 28,26 0,26" fill="none" stroke="#ffcf3b" stroke-width="2"/>
+        <text x="14" y="20" text-anchor="middle" class="danger-bolt">!</text>
+      </g>
+      <text x="65" y="80" text-anchor="middle" class="danger-label">HIGH VOLTAGE</text>
+      <circle class="spark" cx="45" cy="100" r="1.6" fill="#fff2c9"/>
+      <circle class="spark d1" cx="70" cy="130" r="1.6" fill="#fff2c9"/>
+      <circle class="spark d2" cx="90" cy="95" r="1.6" fill="#fff2c9"/>
+      <circle class="led-blink" cx="30" cy="70" r="2" fill="#ff3b3b"/>
+      <circle class="led-blink d1" cx="40" cy="70" r="2" fill="#00ff88"/>
+      <g class="flicker-light">
+        <rect x="150" y="150" width="90" height="30" rx="3" fill="#0d1117" stroke="#26415a"/>
+        <circle cx="165" cy="165" r="3" fill="var(--neon-blue)" class="led-blink"/>
+        <circle cx="180" cy="165" r="3" fill="#00ff88" class="led-blink d1"/>
+        <circle cx="195" cy="165" r="3" fill="#ff9f1a" class="led-blink d2"/>
+      </g>
+    </svg>
+  </section>
+
+  <!-- BOTTOM CENTER: electrical control room -->
+  <section class="zone zone-controlroom" aria-label="Electrical control room">
+    <svg class="scene" viewBox="0 0 560 200" preserveAspectRatio="xMidYMax meet">
+      <rect x="10" y="20" width="540" height="150" rx="6" fill="#0c1119" stroke="#233240" stroke-width="2"/>
+      <!-- meters -->
+      <g transform="translate(60,55)">
+        <circle r="22" fill="#081019" stroke="var(--neon-blue)" stroke-width="2"/>
+        <g class="gauge-needle small"><line x1="0" y1="0" x2="0" y2="-15" stroke="#ff9f1a" stroke-width="2"/></g>
+      </g>
+      <g transform="translate(130,55)">
+        <circle r="22" fill="#081019" stroke="#00ff88" stroke-width="2"/>
+        <g class="gauge-needle small rev"><line x1="0" y1="0" x2="0" y2="-15" stroke="#00ff88" stroke-width="2"/></g>
+      </g>
+      <!-- waveform screen -->
+      <rect x="170" y="35" width="220" height="60" rx="4" fill="#020a12" stroke="#0d3a52" stroke-width="1.5"/>
+      <polyline id="waveform" points="" fill="none" stroke="var(--neon-blue)" stroke-width="1.6"/>
+      <!-- switches / buttons -->
+      <g transform="translate(410,32)">
+        <rect width="16" height="26" rx="3" fill="#1a222c" stroke="#3a4a5a"/>
+        <rect class="switch-toggle" width="10" height="10" x="3" y="3" fill="#00ff88"/>
+      </g>
+      <g transform="translate(432,32)">
+        <rect width="16" height="26" rx="3" fill="#1a222c" stroke="#3a4a5a"/>
+        <rect class="switch-toggle d1" width="10" height="10" x="3" y="13" fill="#ff9f1a"/>
+      </g>
+      <g transform="translate(454,32)">
+        <rect width="16" height="26" rx="3" fill="#1a222c" stroke="#3a4a5a"/>
+        <rect class="switch-toggle d2" width="10" height="10" x="3" y="3" fill="var(--neon-blue)"/>
+      </g>
+      <!-- blinking button grid -->
+      <g transform="translate(410,70)">
+        <circle class="led-blink" cx="0" cy="0" r="4" fill="#ff3b3b"/>
+        <circle class="led-blink d1" cx="16" cy="0" r="4" fill="#00ff88"/>
+        <circle class="led-blink d2" cx="32" cy="0" r="4" fill="var(--neon-blue)"/>
+        <circle class="led-blink" cx="0" cy="16" r="4" fill="#ff9f1a"/>
+        <circle class="led-blink d1" cx="16" cy="16" r="4" fill="#00ff88"/>
+        <circle class="led-blink d2" cx="32" cy="16" r="4" fill="var(--neon-blue)"/>
+      </g>
+      <!-- power indicators row -->
+      <g transform="translate(30,120)">
+        <rect width="500" height="30" rx="4" fill="#0a0f16" stroke="#1c2c3d"/>
+        <text x="10" y="19" class="status-text small">GRID</text>
+        <circle class="led-blink" cx="60" cy="15" r="3" fill="#00ff88"/>
+        <text x="90" y="19" class="status-text small">BACKUP</text>
+        <circle class="led-blink d1" cx="160" cy="15" r="3" fill="#00ff88"/>
+        <text x="190" y="19" class="status-text small">LOAD BALANCE</text>
+        <circle class="led-blink d2" cx="300" cy="15" r="3" fill="var(--neon-blue)"/>
+        <text x="330" y="19" class="status-text small">OUTPUT</text>
+        <circle class="led-blink" cx="400" cy="15" r="3" fill="#ff9f1a"/>
+      </g>
+    </svg>
+  </section>
+
+  <!-- BOTTOM RIGHT: transmission tower -->
+  <section class="zone zone-tower" aria-label="Power transmission status">
+    <svg class="scene" viewBox="0 0 260 200" preserveAspectRatio="xMidYMax meet">
+      <g class="city-lights">
+        <rect x="0" y="150" width="18" height="40" fill="#0c1119"/>
+        <rect x="22" y="130" width="18" height="60" fill="#0c1119"/>
+        <rect x="44" y="160" width="18" height="30" fill="#0c1119"/>
+        <circle class="win" cx="6" cy="160" r="1.4"/>
+        <circle class="win d1" cx="12" cy="170" r="1.4"/>
+        <circle class="win d2" cx="30" cy="145" r="1.4"/>
+        <circle class="win" cx="36" cy="160" r="1.4"/>
+        <circle class="win d1" cx="50" cy="170" r="1.4"/>
+      </g>
+      <g class="tower" transform="translate(160,10)">
+        <line x1="0" y1="0" x2="-30" y2="170" stroke="#3a4552" stroke-width="3"/>
+        <line x1="0" y1="0" x2="30" y2="170" stroke="#3a4552" stroke-width="3"/>
+        <line x1="-40" y1="40" x2="40" y2="40" stroke="#3a4552" stroke-width="2"/>
+        <line x1="-30" y1="80" x2="30" y2="80" stroke="#3a4552" stroke-width="2"/>
+        <line x1="-22" y1="120" x2="22" y2="120" stroke="#3a4552" stroke-width="2"/>
+        <line x1="-40" y1="40" x2="0" y2="0" stroke="#3a4552" stroke-width="1.5"/>
+        <line x1="40" y1="40" x2="0" y2="0" stroke="#3a4552" stroke-width="1.5"/>
+        <circle cx="0" cy="-4" r="2.4" fill="#ff3b3b" class="blink-slow"/>
+      </g>
+      <path class="power-line" d="M-30,50 Q60,20 200,50" fill="none" stroke="#3a4552" stroke-width="1.5"/>
+      <circle class="power-pulse" cx="-30" cy="50" r="3" fill="var(--neon-blue)"/>
+    </svg>
+  </section>
+
+  <!-- BOTTOM FEATURE ICONS moved into center panel already; keep footer -->
+
+</main>
+
+<!-- ============================================================
+     FOOTER STRIP
+     ============================================================ -->
+<footer class="footer-strip glass-card">
+  <div class="footer-item">
+    <svg viewBox="0 0 24 24" class="footer-icon"><path d="M12,2 L20,6 V12 C20,17 16.5,20.5 12,22 C7.5,20.5 4,17 4,12 V6 Z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+    Improving Performance
+  </div>
+  <div class="footer-item">
+    <svg viewBox="0 0 24 24" class="footer-icon"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8,11 V7 a4,4 0 0 1 8,0 v4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+    Enhancing Security
+  </div>
+  <div class="footer-item">
+    <svg viewBox="0 0 24 24" class="footer-icon"><use href="#gearShape" transform="scale(0.4) translate(6,6)"/></svg>
+    Better Experience
+  </div>
+  <div class="footer-item">
+    <svg viewBox="0 0 24 24" class="footer-icon"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12,7 V12 L16,14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    Thank You For Your Patience
+  </div>
+</footer>
+
+<!-- shared defs -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="gearShape">
+      <path fill="currentColor" d="M30,4 l4,0 l1.2,7 a22,22 0 0 1 6.6,2.7 l5.7,-4.3 l2.8,2.8 l-4.3,5.7 a22,22 0 0 1 2.7,6.6 l7,1.2 l0,4 l-7,1.2 a22,22 0 0 1 -2.7,6.6 l4.3,5.7 l-2.8,2.8 l-5.7,-4.3 a22,22 0 0 1 -6.6,2.7 l-1.2,7 l-4,0 l-1.2,-7 a22,22 0 0 1 -6.6,-2.7 l-5.7,4.3 l-2.8,-2.8 l4.3,-5.7 a22,22 0 0 1 -2.7,-6.6 l-7,-1.2 l0,-4 l7,-1.2 a22,22 0 0 1 2.7,-6.6 l-4.3,-5.7 l2.8,-2.8 l5.7,4.3 a22,22 0 0 1 6.6,-2.7 Z M32,22 a10,10 0 1 0 0,20 a10,10 0 1 0 0,-20 Z" fill-rule="evenodd"/>
+    </g>
+  </defs>
+</svg>
+
+<script src="script.js"></script>
+</body>
+</html>
