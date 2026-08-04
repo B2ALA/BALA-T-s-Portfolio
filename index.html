@@ -1,259 +1,65 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS-9 // Industrial SCADA Command Center</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Under Maintenance</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-    <!-- Global Cinematic Filter Overlays -->
-    <div class="vignette-overlay"></div>
-    <div class="scanline-overlay"></div>
-    <div id="cursor-glow" class="cursor-glow"></div>
+  <!-- Background Grid Layout -->
+  <div class="bg-grid">
+    <div class="bg-card construction"></div>
+    <div class="bg-card servers"></div>
+    <div class="bg-card pipelines"></div>
+    <div class="bg-card electrical"></div>
+  </div>
 
-    <!-- 3D Environment Wrapper -->
-    <main id="cinematic-environment" class="environment">
+  <!-- Central Maintenance UI Card -->
+  <main class="maintenance-card">
+    <div class="gear-icon">
+      <i class="fa-solid fa-gears"></i>
+    </div>
+    
+    <h1>UNDER MAINTENANCE</h1>
+    <p class="subtitle">We're upgrading our infrastructure.</p>
+    <p class="sub-highlight">We'll be back soon.</p>
 
-        <!-- ==========================================
-             LAYER 1: FAR BACKGROUND (Atmosphere & Skyline)
-             ========================================== -->
-        <div class="depth-layer layer-far" data-parallax="-0.02">
-            <div class="ambient-fog"></div>
-            <!-- Volumetric Light Sources -->
-            <div class="volumetric-light core-blue"></div>
-            <div class="volumetric-light core-amber"></div>
-            
-            <!-- Industrial Skyline / Silhouettes -->
-            <svg class="bg-skyline" viewBox="0 0 1920 1080" preserveAspectRatio="none">
-                <path d="M0,1080 L0,800 L150,800 L150,750 L200,750 L200,800 L350,800 L350,650 L400,650 L400,850 L600,850 L600,700 L700,700 L700,900 L900,900 L900,750 L1000,750 L1000,900 L1200,900 L1200,600 L1300,600 L1300,850 L1500,850 L1500,700 L1600,700 L1600,800 L1800,800 L1800,750 L1920,750 L1920,1080 Z" fill="#050810"/>
-                <path d="M100,1080 L100,850 L250,850 L250,900 L450,900 L450,750 L550,750 L550,950 L800,950 L800,800 L950,800 L950,950 L1150,950 L1150,700 L1250,700 L1250,850 L1450,850 L1450,750 L1550,750 L1550,900 L1700,900 L1700,850 L1920,850 L1920,1080 Z" fill="#080c16"/>
-            </svg>
-        </div>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+      <span class="progress-text">100%</span>
+    </div>
 
-        <!-- ==========================================
-             LAYER 2: MIDGROUND INFRASTRUCTURE (Cables & Energy)
-             ========================================== -->
-        <div class="depth-layer layer-mid" data-parallax="-0.04">
-            <svg class="infrastructure-routing" viewBox="0 0 1920 1080">
-                <defs>
-                    <linearGradient id="cyan-beam" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="rgba(0, 243, 255, 0)" />
-                        <stop offset="50%" stop-color="rgba(0, 243, 255, 1)" />
-                        <stop offset="100%" stop-color="rgba(0, 243, 255, 0)" />
-                    </linearGradient>
-                    <linearGradient id="amber-beam" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="rgba(255, 123, 0, 0)" />
-                        <stop offset="50%" stop-color="rgba(255, 123, 0, 1)" />
-                        <stop offset="100%" stop-color="rgba(255, 123, 0, 0)" />
-                    </linearGradient>
-                    <filter id="hyper-glow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur1" />
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur2" />
-                        <feMerge>
-                            <feMergeNode in="blur2" />
-                            <feMergeNode in="blur1" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                </defs>
-                
-                <!-- Physical Cables -->
-                <path d="M-100,400 C 300,400 500,540 850,540" class="physical-cable" />
-                <path d="M2020,700 C 1600,700 1400,540 1070,540" class="physical-cable" />
-                
-                <!-- Animated Energy Beams routing to center -->
-                <path d="M-100,400 C 300,400 500,540 850,540" class="energy-beam cyan-flow" filter="url(#hyper-glow)" />
-                <path d="M2020,700 C 1600,700 1400,540 1070,540" class="energy-beam amber-flow" filter="url(#hyper-glow)" />
-                <path d="M-100,800 C 400,800 600,600 850,600" class="energy-beam cyan-flow-alt" filter="url(#hyper-glow)" />
-                <path d="M2020,300 C 1500,300 1300,480 1070,480" class="energy-beam amber-flow-alt" filter="url(#hyper-glow)" />
-            </svg>
-        </div>
+    <!-- Category Indicators -->
+    <div class="status-grid">
+      <div class="status-item">
+        <i class="fa-solid fa-dharmachakra"></i>
+        <span>CONSTRUCTION<br>WORK</span>
+      </div>
+      <div class="status-item">
+        <i class="fa-solid fa-server"></i>
+        <span>SERVER<br>MANAGEMENT</span>
+      </div>
+      <div class="status-item">
+        <i class="fa-solid fa-faucet-drip"></i>
+        <span>PIPELINE<br>MANAGEMENT</span>
+      </div>
+      <div class="status-item">
+        <i class="fa-solid fa-bolt"></i>
+        <span>ELECTRICAL<br>MANAGEMENT</span>
+      </div>
+    </div>
+  </main>
 
-        <!-- ==========================================
-             LAYER 3: FOREGROUND UI (The Dashboard)
-             ========================================== -->
-        <div class="depth-layer layer-ui" data-parallax="0.03">
-            <div class="ui-layout-grid">
-                
-                <!-- LEFT PANEL: Telemetry & SCADA -->
-                <aside class="ui-panel glass-panel float-slow panel-left" data-tilt>
-                    <div class="panel-border-glow"></div>
-                    <div class="panel-header">
-                        <div class="status-dot blink-fast"></div>
-                        <h2 class="holographic-label">SCADA NETWORK LINK</h2>
-                        <div class="hex-badge cyan-badge">SECURE</div>
-                    </div>
-
-                    <div class="telemetry-module">
-                        <div class="data-row">
-                            <span class="data-label">QUANTUM CORE FREQ</span>
-                            <span class="data-value text-cyan" id="val-cpu">84.2 THz</span>
-                        </div>
-                        <div class="graph-container">
-                            <svg viewBox="0 0 300 50" class="live-wave" preserveAspectRatio="none">
-                                <defs>
-                                    <linearGradient id="cyan-grad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="rgba(0, 243, 255, 0.4)"/>
-                                        <stop offset="100%" stop-color="rgba(0, 243, 255, 0)"/>
-                                    </linearGradient>
-                                </defs>
-                                <path id="wave-fill" class="wave-fill" d="" fill="url(#cyan-grad)" />
-                                <path id="wave-line" class="wave-line" d="" fill="none" stroke="#00f3ff" stroke-width="2" />
-                            </svg>
-                            <div class="scan-bar"></div>
-                        </div>
-                    </div>
-
-                    <div class="telemetry-module">
-                        <div class="data-row">
-                            <span class="data-label">THERMAL DISTRIBUTION</span>
-                            <span class="data-value text-amber" id="val-temp">1,240 °C</span>
-                        </div>
-                        <div class="progress-track">
-                            <div class="progress-fill fill-amber" id="bar-temp" style="width: 65%;">
-                                <div class="progress-glare"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="server-array-visual">
-                        <div class="server-blade active"><span class="led"></span><span class="led"></span></div>
-                        <div class="server-blade active"><span class="led"></span><span class="led"></span></div>
-                        <div class="server-blade warning"><span class="led"></span><span class="led"></span></div>
-                        <div class="server-blade active"><span class="led"></span><span class="led"></span></div>
-                        <div class="server-blade offline"><span class="led"></span><span class="led"></span></div>
-                    </div>
-                </aside>
-
-                <!-- CENTER PANEL: Hero Maintenance Override -->
-                <section class="ui-panel glass-panel hero-panel float-subtle panel-center" data-tilt>
-                    <div class="panel-border-glow intense"></div>
-                    
-                    <!-- Reactor Graphic Background -->
-                    <div class="reactor-backdrop">
-                        <svg viewBox="0 0 400 400">
-                            <circle cx="200" cy="200" r="160" class="reactor-ring outer-ring" />
-                            <circle cx="200" cy="200" r="120" class="reactor-ring mid-ring" />
-                            <circle cx="200" cy="200" r="80" class="reactor-ring inner-ring" />
-                            <polygon points="200,140 252,230 148,230" class="reactor-core-triangle pulse-glow" />
-                        </svg>
-                    </div>
-
-                    <div class="hero-content">
-                        <div class="override-badge">
-                            <div class="loader-spinner"></div>
-                            <span>CRITICAL OVERRIDE INITIATED</span>
-                        </div>
-                        
-                        <h1 class="metallic-typography">
-                            <span class="title-layer-bg">SYSTEM</span>
-                            <span class="title-layer-fg">SYSTEM</span>
-                            <br>
-                            <span class="text-gradient-amber">MAINTENANCE</span>
-                        </h1>
-                        
-                        <p class="diagnostics-feed">
-                            <span class="typewriter">> Re-routing primary grid power...</span><br>
-                            <span class="typewriter delay-1">> Upgrading autonomous SCADA subroutines...</span><br>
-                            <span class="typewriter delay-2">> All structural fabrication pipelines suspended.</span>
-                        </p>
-
-                        <div class="master-progress-module">
-                            <div class="progress-header">
-                                <span class="glow-text-cyan">GLOBAL SYNCHRONIZATION</span>
-                                <span class="percentage-readout text-cyan" id="master-percent">82.4%</span>
-                            </div>
-                            <div class="master-track">
-                                <div class="master-fill" id="master-bar" style="width: 82.4%;">
-                                    <div class="energy-streak"></div>
-                                </div>
-                                <div class="track-grid-overlay"></div>
-                            </div>
-                            <div class="hex-status-row">
-                                <div class="status-hex active"></div>
-                                <div class="status-hex active"></div>
-                                <div class="status-hex active"></div>
-                                <div class="status-hex active"></div>
-                                <div class="status-hex inactive"></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- RIGHT PANEL: Mechanical & Fluid Dynamics -->
-                <aside class="ui-panel glass-panel float-slow-reverse panel-right" data-tilt>
-                    <div class="panel-border-glow"></div>
-                    <div class="panel-header right-align">
-                        <div class="hex-badge amber-badge">OPERATIONAL</div>
-                        <h2 class="holographic-label">FLUIDICS & MECHANICS</h2>
-                        <div class="status-dot blink-slow bg-amber"></div>
-                    </div>
-
-                    <!-- SVG Procedural Gear System -->
-                    <div class="mechanical-viewport">
-                        <svg viewBox="0 0 250 150" class="gearbox-svg">
-                            <defs>
-                                <radialGradient id="metal-grad" cx="50%" cy="50%" r="50%">
-                                    <stop offset="60%" stop-color="#1a2436" />
-                                    <stop offset="100%" stop-color="#0a0f18" />
-                                </radialGradient>
-                                <filter id="drop-shadow">
-                                    <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000" flood-opacity="0.8"/>
-                                </filter>
-                            </defs>
-                            
-                            <!-- Large Gear -->
-                            <g class="gear rotate-cw" transform="translate(70, 75)" filter="url(#drop-shadow)">
-                                <circle r="55" fill="url(#metal-grad)" stroke="#ff7b00" stroke-width="2"/>
-                                <path d="M-65,-12 L-75,-15 L-75,15 L-65,12 Z M65,-12 L75,-15 L75,15 L65,12 Z M-12,-65 L-15,-75 L15,-75 L12,-65 Z M-12,65 L-15,75 L15,75 L12,65 Z" fill="#ff7b00"/>
-                                <circle r="20" fill="#030509" stroke="#ff7b00" stroke-width="2" stroke-dasharray="8 4"/>
-                                <circle r="8" fill="#ff7b00" />
-                            </g>
-                            
-                            <!-- Small Gear -->
-                            <g class="gear rotate-ccw" transform="translate(170, 75)" filter="url(#drop-shadow)">
-                                <circle r="35" fill="url(#metal-grad)" stroke="#00f3ff" stroke-width="2"/>
-                                <path d="M-40,-8 L-48,-10 L-48,10 L-40,8 Z M40,-8 L48,-10 L48,10 L40,8 Z M-8,-40 L-10,-48 L10,-48 L8,-40 Z M-8,40 L-10,48 L10,48 L8,40 Z" fill="#00f3ff"/>
-                                <circle r="12" fill="#030509" stroke="#00f3ff" stroke-width="2"/>
-                                <circle r="5" fill="#00f3ff" />
-                            </g>
-                        </svg>
-                        <div class="overlay-telemetry">
-                            <span class="data-label">TURBINE RPM</span>
-                            <span class="data-value text-white" id="val-rpm">14,200</span>
-                        </div>
-                    </div>
-
-                    <!-- Fluid Pipeline Simulation -->
-                    <div class="fluid-module">
-                        <div class="data-row">
-                            <span class="data-label">HYDRAULIC PRESSURE</span>
-                            <span class="data-value text-cyan" id="val-pressure">12.4 BAR</span>
-                        </div>
-                        <div class="pipeline-casing">
-                            <div class="pipeline-interior">
-                                <div class="fluid-stream"></div>
-                                <div class="particle-bubbles" id="bubble-track"></div>
-                            </div>
-                            <div class="valve-wheel spin-continuous"></div>
-                        </div>
-                    </div>
-                </aside>
-
-            </div>
-        </div>
-
-        <!-- ==========================================
-             LAYER 4: MACRO FOREGROUND (Bokeh & Sparks)
-             ========================================== -->
-        <div class="depth-layer layer-particles" id="particle-engine" data-parallax="0.08">
-            <!-- Particles injected via JS -->
-        </div>
-
-    </main>
-
-    <script src="script.js"></script>
+  <!-- Footer Status Bar -->
+  <footer class="footer-bar">
+    <div><i class="fa-solid fa-circle-check"></i> IMPROVING PERFORMANCE</div>
+    <div><i class="fa-solid fa-lock"></i> ENHANCING SECURITY</div>
+    <div><i class="fa-solid fa-sliders"></i> BETTER EXPERIENCE</div>
+    <div><i class="fa-solid fa-clock"></i> THANK YOU FOR YOUR PATIENCE</div>
+  </footer>
 </body>
 </html>
